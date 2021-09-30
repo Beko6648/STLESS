@@ -1,0 +1,54 @@
+{
+	"name": "stless",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron .",
+		"build": "npx electron-builder --win --x64"
+	},
+	"build": {
+		"appId": "com.example.STLESS",
+		"productName": "STLESS",
+		"asar": true,
+		"files": [
+			"**/*"
+		],
+		"extraFiles": [
+			{
+				"from": "icon",
+				"to": "resources",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"win": {
+			"target": "nsis",
+			"icon": "./icon/atom-256px.png"
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Beko6648/STLESS.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Beko6648/STLESS/issues"
+	},
+	"homepage": "https://github.com/Beko6648/STLESS#readme",
+	"devDependencies": {
+		"electron": "^15.0.0",
+		"electron-builder": "^22.11.7"
+	},
+	"dependencies": {
+		"electron-store": "^8.0.1",
+		"jquery": "^3.6.0",
+		"path": "^0.12.7"
+	}
+}
