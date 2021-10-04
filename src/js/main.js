@@ -8,7 +8,7 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 // アプリの起動準備が完了したら
 app.once('ready', () => {
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    var pyshell = new PythonShell('../python/sample.py');
+    var pyshell = new PythonShell('../python/sample.py', { mode: "json" });
 
     PythonShell.run('./src/python/sample.py', null, function (err, result) {
         if (err) throw err;
