@@ -8,14 +8,13 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 // アプリの起動準備が完了したら
 app.once('ready', () => {
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    var pyshell = new PythonShell('./src/python/sample.py');
+    var pyshell = new PythonShell('./src/python/sample.py', { mode: 'json' });
 
     //pythonコード実施後にpythonからjsにデータが引き渡される。
     //pythonに引き渡されるデータは「data」に格納される。
     pyshell.on('message', function (data) {
-        result = JSON.parse(data);
-        console.log(result);
-        console.log('result.flag:', result.array);
+        console.log(data)
+        console.log('array', data.array);
     });
 
 
