@@ -21,9 +21,9 @@ app.once('ready', () => {
         console.log('enter_or_leave', data.enter_or_leave);
 
         if (data.hasOwnProperty('people_cnt_in_store')) {
-            
+
         } else {
-            people_in_store_queue
+            people_in_store_queue(data.time_data, data.enter_or_leave); 
         }
 
     });
