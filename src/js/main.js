@@ -5,6 +5,9 @@ const { PythonShell } = require('python-shell');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 
+let people_in_store_queue = [];
+let shopping_time_queue = [];
+
 // アプリの起動準備が完了したら
 app.once('ready', () => {
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
@@ -13,9 +16,34 @@ app.once('ready', () => {
     //pythonコード実施後にpythonからjsにデータが引き渡される。
     //pythonに引き渡されるデータは「data」に格納される。
     pyshell.on('message', function (data) {
-        console.log(data)
-        console.log('array', data.array);
+        console.log(data);
+        console.log('time_data', data.time_data);
+        console.log('enter_or_leave', data.enter_or_leave);
+
+        if (data.hasOwnProperty('people_cnt_in_store')) {
+            
+        } else {
+            people_in_store_queue
+        }
+
     });
+
+    let people_in_store_queue_control = (time_data, enter_or_leave) => {
+        const date = new Date(time_data);
+        date.setMilliseconds(0);
+
+        if (enter_or_leave) {
+            people_in_store_queue.push(date);
+        } else {
+            const enter_time = people_in_store_queue.shift();
+            const leave_time = time_data;
+            shopping_time_queue.push({
+                enter_time: enter_time,
+                leave_time: leave_time
+            })
+
+        }
+    }
 
 
     // // 常駐モジュールウィンドウを開く
