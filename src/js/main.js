@@ -50,6 +50,10 @@ app.once('ready', () => {
         }
     }
 
+    let Regulatory_Process = (people_cnt_in_store, max_people_in_store, enter_time_info) => {
+        
+    }
+
 
     // ウィンドウを開く
     testWindow = new BrowserWindow({
