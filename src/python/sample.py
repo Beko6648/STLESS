@@ -1,18 +1,19 @@
 import json
 import datetime
 
-class date_class:
-    def __init__(self, access):
-        self.dt_now = datetime.datetime.now()
-        # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
-        self.access = access
 
-test = {
-	"time_data": "2006-01-02T15:04:05.999Z",
-	"enter_or_leave": "enter"
-}
+def date_class(access):
+    dt_now = datetime.datetime.now()
+    # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
+    access = access
+    dict = {
+        "time_data": dt_now,
+        "enter_or_leave": access
+    }
+    return dict
 
-print(json.dumps(test))
+print(json.dumps(date_class('enter')))
+
 
 # f = open('./src/python/test.json', 'r')
 # json_dict = json.load(f)
