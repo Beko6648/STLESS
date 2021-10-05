@@ -6,8 +6,10 @@ const { PythonShell } = require('python-shell');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 
-let people_in_store_queue = [];
-let shopping_time_queue = [];
+// 変数の初期化
+let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
+let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
+let max_people_in_store = null; // 店舗最大許容人数
 
 // アプリの起動準備が完了したら
 app.once('ready', () => {
@@ -17,7 +19,7 @@ app.once('ready', () => {
     //pythonコード実施後にpythonからjsにデータが引き渡される。
     //pythonに引き渡されるデータは「data」に格納される。
     pyshell.on('message', function (data) {
-        // console.log(data);
+        console.log('data', data);
 
         if (data.hasOwnProperty('people_cnt_in_store')) {
 
@@ -33,7 +35,7 @@ app.once('ready', () => {
         const date = new Date(time_data);
         date.setMilliseconds(0);
 
-        if (enter_or_leave) {　// 入店時ならキューに追加
+        if (enter_or_leave) { // 入店時ならキューに追加
             people_in_store_queue.push(date);
 
             console.log('people_in_store_queue', people_in_store_queue);
