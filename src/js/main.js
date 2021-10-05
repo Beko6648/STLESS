@@ -10,6 +10,7 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
 let max_people_in_store = null; // 店舗最大許容人数
+let waiting_time_estimation_data = null; // 待ち時間推測用データ
 
 // アプリの起動準備が完了したら
 app.once('ready', () => {
@@ -52,8 +53,23 @@ app.once('ready', () => {
         }
     }
 
-    let Regulatory_Process = (people_cnt_in_store, max_people_in_store, enter_time_info) => {
-        
+    let regulatory_process = (people_cnt_in_store, max_people_in_store, people_in_store_queue, waiting_time_estimation_data) => {
+        // 規制間近の人数割合
+        let imminent_regulation_ratio = 0.9;
+        // display_apiに渡すための規制情報を格納する変数
+        let regulatory_process_info = null;
+        // display_apiに渡すための待ち時間データを格納した変数
+        let waiting_time_array = [];
+
+
+        if (max_people_in_store <= people_cnt_in_store) {
+            display_api()
+        }
+    }
+
+
+    let display_api = () => {
+
     }
 
 
