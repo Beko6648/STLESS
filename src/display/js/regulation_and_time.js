@@ -1,11 +1,15 @@
 $(() => {
+    const displaying_URL = 'regulation_and_time.html'
+
     const api_access = () => {
         let A_xhr = new XMLHttpRequest();
         A_xhr.open("GET", "/api/next_html");
         A_xhr.addEventListener("load", function (e) {
             let next_html = JSON.parse(A_xhr.responseText);
             console.log(next_html);
-            // window.location.assign(next_html);
+            if (displaying_URL != next_html) {
+                window.location.assign(next_html);
+            }
         });
         A_xhr.send();
 

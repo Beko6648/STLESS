@@ -20,10 +20,11 @@ let waiting_time_estimation_data = null; // 待ち時間推測用データ 形�
 let waiting_time_array = [1, 2, 3]; // ３人分の待ち時間が格納された配列
 let next_html = null; // 規制情報表示ディスプレイに表示させるhtml
 
+
 // アプリの起動準備が完了したら
 app.once('ready', () => {
 
-    // 規制情報表示htmlを公開
+    // 規制情報表示ディスプレイのためにhttpサーバを立てる
     express_app.use(express.static(path.join(__dirname, '../display')));
     express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
@@ -31,7 +32,7 @@ app.once('ready', () => {
     express_app.get("/api/next_html", function (req, res, next) {
         res.json(next_html);
     });
-
+    // 規制情報表示htmlからのリクエストに対し、待ち時間を格納した配列を返す
     express_app.get("/api/waiting_time_array", function (req, res, next) {
         res.json(waiting_time_array);
     });
