@@ -1,6 +1,9 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { PythonShell } = require('python-shell');
+const express = require('express');
+const express_app = express();
+const port = 3000;
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -14,9 +17,26 @@ let people_in_store_queue = []; // 店内の客を管理するキュー入店時
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
 let max_people_in_store = null; // 店舗最大許容人数
 let waiting_time_estimation_data = null; // 待ち時間推測用データ 形式{ hour, minute }
+let waiting_time_array = [1, 2, 3]; // ３人分の待ち時間が格納された配列
+let next_html = null; // 規制情報表示ディスプレイに表示させるhtml
 
 // アプリの起動準備が完了したら
 app.once('ready', () => {
+
+    // 規制情報表示htmlを公開
+    express_app.use(express.static(path.join(__dirname, '../display')));
+    express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+
+    // 規制情報表示htmlからのリクエストに対し、次に表示するhtml情報を返す
+    express_app.get("/api/next_html", function (req, res, next) {
+        res.json(next_html);
+    });
+
+    express_app.get("/api/waiting_time_array", function (req, res, next) {
+        res.json(waiting_time_array);
+    });
+
+
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
     var pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json' });
 
@@ -37,7 +57,7 @@ app.once('ready', () => {
             people_in_store_queue.push(date);
             console.log('people_in_store_queue', people_in_store_queue);
 
-        } else if(enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
+        } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
             const leave_time = time_data;
 
@@ -47,7 +67,7 @@ app.once('ready', () => {
             })
 
             console.log('shopping_time_queue', shopping_time_queue);
-        }else{
+        } else {
             console.log('enterかleaveを入力してください');
         }
     }
@@ -55,10 +75,10 @@ app.once('ready', () => {
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
         if (max_people_in_store <= people_count) {　// 規制する場合
-            let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間
+            let first_three_in_line = people_in_store_queue.slice(2); // 店内に最初に入った３人分の入店時間
 
             // 3人分の入店時間に待ち時間推測用データを加算し、規制表示関数へ引き渡す
-            first_three_in_line.map((value) => {
+            waiting_time_array = first_three_in_line.map((value) => {
                 let entry_date = new Date(value); // 格納されていた入店時間データ
                 // 待ち時間推測用データ（平均買い物時間）を加算する
                 entry_date.setHours(entry_data.getHours() + waiting_time_estimation_data.hour);
@@ -66,31 +86,18 @@ app.once('ready', () => {
 
                 return entry_date.toISOString();
             })
-            display_regulation_and_time(first_three_in_line);
-
-        }else if (max_people_in_store * regulation_nearing_ratio <= people_count){ // 規制間近
-            display_regulation_nearing();
-        }else {
-            display_allow_entry();
+            next_html = 'regulation_and_time.html';
+        } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
+            next_html = 'regulation_nearing.html';
+        } else {
+            next_html = 'allow_entry.html';
         }
     }
 
 
-    let display_allow_entry = () => { // 入店許可
-        
-    }
-        
-    let display_regulation_nearing = () => { // 規制間近
-
-    }
-
-    let display_regulation_and_time = (waiting_time_array) => { // 規制（待ち時間表示あり）
-
-    }
-
-    let display_regulation = () => { // 規制（待ち時間表示なし）
-
-    }
+    // let display_regulation_without_time = () => { // 規制（待ち時間表示なし）
+    //     next_html = 'regulation_without_time.html';
+    // }
 
 
     // ウィンドウを開く
