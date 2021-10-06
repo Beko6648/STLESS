@@ -4,11 +4,12 @@ import datetime
 
 def date_class(access):
     dt_now = datetime.datetime.now()
+    time_str = dt_now.isoformat(timespec='seconds') # 2018-12-31T05:00:30 という形式
     # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
-    access = access
     dict = {
-        "time_data": dt_now,
-        "enter_or_leave": access
+        "time_data": time_str,
+        "enter_or_leave": access,
+        "people_count": total
     }
     return dict
 
