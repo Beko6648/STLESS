@@ -48,6 +48,7 @@
 	},
 	"dependencies": {
 		"electron-store": "^8.0.1",
+		"express": "^4.17.1",
 		"jquery": "^3.6.0",
 		"path": "^0.12.7",
 		"python-shell": "^3.0.0"

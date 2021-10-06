@@ -17,7 +17,7 @@ let people_in_store_queue = []; // 店内の客を管理するキュー入店時
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
 let max_people_in_store = null; // 店舗最大許容人数
 let waiting_time_estimation_data = null; // 待ち時間推測用データ 形式{ hour, minute }
-let waiting_time_array = [1, 2, 3]; // ３人分の待ち時間が格納された配列
+let waiting_time_array = []; // ３人分の待ち時間が格納された配列
 let next_html = null; // 規制情報表示ディスプレイに表示させるhtml
 
 
@@ -39,14 +39,12 @@ app.once('ready', () => {
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    var pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json' });
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json' });
 
-    //pythonコード実施後にpythonからjsにデータが引き渡される。
-    //pythonに引き渡されるデータは「data」に格納される。
     pyshell.on('message', function (data) {
         console.log('data', data);
-        regulatory_process(data.people_count);
-        people_in_store_queue_control(data.time_data, data.enter_or_leave);
+        // regulatory_process(data.people_count);
+        // people_in_store_queue_control(data.time_data, data.enter_or_leave);
     });
 
 

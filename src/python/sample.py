@@ -1,11 +1,19 @@
 import json
 import datetime
+import time
 
+total = 0
 
 def date_class(access):
+    global total
     dt_now = datetime.datetime.now()
     time_str = dt_now.isoformat(timespec='seconds') # 2018-12-31T05:00:30 という形式
-    # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
+    
+    if(access == 'enter'):
+        total+=1
+    elif(access == 'leave'):
+        total-=1
+
     dict = {
         "time_data": time_str,
         "enter_or_leave": access,
@@ -13,7 +21,13 @@ def date_class(access):
     }
     return dict
 
-print(json.dumps(date_class('enter')))
+# print(json.dumps(date_class('enter')))
+
+while True:
+    print(json.dumps(date_class('enter')))
+    time.sleep(10)
+    print(json.dumps(date_class('leave')))
+    time.sleep(10)
 
 
 # f = open('./src/python/test.json', 'r')
