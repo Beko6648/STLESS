@@ -44,7 +44,7 @@ app.once('ready', () => {
     console.log('init_pyshell');
 
     pyshell.on('message', function (data) {
-        // console.log('data', data);
+        console.log('data', data);
         people_in_store_queue_control(data.time_data, data.enter_or_leave);
         regulatory_process(data.people_count);
     });
@@ -53,6 +53,7 @@ app.once('ready', () => {
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
     let people_in_store_queue_control = (time_data, enter_or_leave) => {
         const date = new Date(time_data);
+        date.setHours(date.getHours() + 9); // JSTに変換するため９時間プラス
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(date);
@@ -68,7 +69,7 @@ app.once('ready', () => {
             })
 
             console.log('people_in_store_queue', people_in_store_queue);
-            // console.log('shopping_time_queue', shopping_time_queue);
+            console.log('shopping_time_queue', shopping_time_queue);
         } else {
             console.log('enterかleaveを入力してください');
         }
@@ -79,9 +80,11 @@ app.once('ready', () => {
         if (max_people_in_store <= people_count) { // 規制する場合
             let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間
             console.log('first_three_in_line', first_three_in_line);
+
             // 3人分の入店時間に待ち時間推測用データを加算し、規制表示関数へ引き渡す
             leave_time_array = first_three_in_line.map((value) => {
                 let entry_date = new Date(value); // 格納されていた入店時間データ
+
                 // 待ち時間推測用データ（平均買い物時間）を加算する
                 entry_date.setHours(entry_date.getHours() + waiting_time_estimation_data.hour);
                 entry_date.setMinutes(entry_date.getMinutes() + waiting_time_estimation_data.minute);

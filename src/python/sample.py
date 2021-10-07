@@ -2,14 +2,14 @@ import json
 import datetime
 import time
 import random
+import pytz
 
 total = 0
 
 def get_dict_data(access):
     global total
-    dt_now = datetime.datetime.now()
+    dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
     time_str = dt_now.isoformat(timespec='seconds') # 2018-12-31T05:00:30 という形式
-    
     if(access == 'enter'):
         total+=1
     elif(access == 'leave'):
