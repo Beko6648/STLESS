@@ -2,7 +2,6 @@ import json
 import datetime
 import time
 import random
-import sys
 
 total = 0
 
