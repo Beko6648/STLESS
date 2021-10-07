@@ -1,10 +1,12 @@
 import json
 import datetime
 import time
+import random
+import sys
 
 total = 0
 
-def date_class(access):
+def get_dict_data(access):
     global total
     dt_now = datetime.datetime.now()
     time_str = dt_now.isoformat(timespec='seconds') # 2018-12-31T05:00:30 という形式
@@ -21,16 +23,12 @@ def date_class(access):
     }
     return dict
 
-# print(json.dumps(date_class('enter')))
+# print(json.dumps(get_dict_data('enter')))
 
 while True:
-    print(json.dumps(date_class('enter')))
-    time.sleep(10)
-    print(json.dumps(date_class('leave')))
-    time.sleep(10)
-
-
-# f = open('./src/python/test.json', 'r')
-# json_dict = json.load(f)
-# json_str = json.dumps(json_dict)
-# print(json_str)
+    if(random.randint(0,1) == 0):
+        print(json.dumps(get_dict_data('enter')))
+    elif(total>0):
+        print(json.dumps(get_dict_data('leave')))
+    sys.stdout.flush()
+    time.sleep(5)

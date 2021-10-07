@@ -39,12 +39,14 @@ app.once('ready', () => {
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json' });
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOption: ['-u'], });
+
+    console.log('init_pyshell');
 
     pyshell.on('message', function (data) {
-        console.log('data', data);
-        // regulatory_process(data.people_count);
-        // people_in_store_queue_control(data.time_data, data.enter_or_leave);
+        // console.log('data', data);
+        regulatory_process(data.people_count);
+        people_in_store_queue_control(data.time_data, data.enter_or_leave);
     });
 
 
