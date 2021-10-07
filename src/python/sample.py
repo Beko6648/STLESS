@@ -30,5 +30,4 @@ while True:
         print(json.dumps(get_dict_data('enter')))
     elif(total>0):
         print(json.dumps(get_dict_data('leave')))
-    sys.stdout.flush()
     time.sleep(5)
