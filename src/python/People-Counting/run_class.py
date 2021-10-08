@@ -19,18 +19,10 @@ import pytz
 
 
 t0 = time.time()
-totalUp = 0
-totalDown = 0
-total = 0
-x = 0
-
-
-
-class date_class:
-    def __init__(self, access):
-        self.dt_now = datetime.datetime.now()
-        # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
-        self.access = access
+total_leave = 0
+total_enter = 0
+total = 0 # get_dictのための変数
+total_people_inside = 0
 
 
 def run(vs, frame_name):
@@ -144,21 +136,21 @@ def run(vs, frame_name):
                 to.centroids.append(centroid)
 
                 if not to.counted:
-                    global totalUp
-                    global totalDown
+                    global total_leave
+                    global total_enter
                     # global list empty = []
                     # global list empty1 = []
-                    global x
+                    global total_people_inside
                     if direction < 0 and centroid[1] < H // 2:
-                        totalUp += 1
+                        total_leave += 1
 
                         print(json.dumps(get_dict_data('leave')))
                         to.counted = True
                     elif direction > 0 and centroid[1] > H // 2:
-                        totalDown += 1
+                        total_enter += 1
                         print(json.dumps(get_dict_data('enter')))
                         
-                        if x >= config.Threshold:
+                        if total_people_inside >= config.Threshold:
                             cv2.putText(frame, "-ALERT: People limit exceeded-", (10, frame.shape[0] - 80),
                                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 2)
                             if config.ALERT:
@@ -166,7 +158,7 @@ def run(vs, frame_name):
                                 Mailer().send(config.MAIL)
                                 # print("[INFO] Alert sent")
                         to.counted = True
-                    x = totalDown - totalUp
+                    total_people_inside = total_enter - total_leave
 
             trackableObjects[objectID] = to
             text = "ID {}".format(objectID)
@@ -176,13 +168,13 @@ def run(vs, frame_name):
                 frame, (centroid[0], centroid[1]), 4, (255, 255, 255), -1)
 
         info = [
-            ("Exit", totalUp),
-            ("Enter", totalDown),
+            ("Leave", total_leave),
+            ("Enter", total_enter),
             ("Status", status),
         ]
 
         info2 = [
-            ("Total people inside", x),
+            ("Total people inside", total_people_inside),
         ]
 
         for (i, (k, v)) in enumerate(info):
