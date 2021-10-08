@@ -20,13 +20,14 @@ t0 = time.time()
 totalUp = 0
 totalDown = 0
 
+
 class date_class:
     def __init__(self, access):
         self.dt_now = datetime.datetime.now()
         # self.date_data = [self.dt_now.month, self.dt_now.day, self.dt_now.hour, self.dt_now.minute]
         self.access = access
-        
-        
+
+
 def run(vs, frame_name):
     # print(frame_name)
     args = {'prototxt': 'mobilenet_ssd/MobileNetSSD_deploy.prototxt',
@@ -34,13 +35,13 @@ def run(vs, frame_name):
             'input': 'videos/example_01.mp4',
             'output': None,
             'confidence': 0.4,
-            'skip_frames': 10}
+            'skip_frames': 15}
 
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-            "sofa", "train", "tvmonitor"]
-    
+               "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+               "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+               "sofa", "train", "tvmonitor"]
+
     net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
     if not args.get("input", False):
@@ -55,7 +56,7 @@ def run(vs, frame_name):
     writer = None
     W = None
     H = None
-    
+
     ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
     trackers = []
     trackableObjects = {}
@@ -64,7 +65,7 @@ def run(vs, frame_name):
     # totalDown = 0
     # totalUp = 0
     x = []
-    empty = []  
+    empty = []
     empty1 = []
 
     fps = FPS().start()
@@ -78,13 +79,13 @@ def run(vs, frame_name):
 
         frame = imutils.resize(frame, width=500)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
+
         if W is None or H is None:
             (H, W) = frame.shape[:2]
-            
+
         if args["output"] is not None and writer is None:
             fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-            writer = cv2.VideoWriter(args["output"], fourcc, 10, (W, H), True)
+            writer = cv2.VideoWriter(args["output"], fourcc, 15, (W, H), True)
 
         status = "Waiting"
         rects = []
@@ -100,7 +101,7 @@ def run(vs, frame_name):
                 confidence = detections[0, 0, i, 2]
                 if confidence > args["confidence"]:
                     idx = int(detections[0, 0, i, 1])
-                    
+
                     if CLASSES[idx] != "person":
                         continue
 
@@ -118,7 +119,7 @@ def run(vs, frame_name):
 
                 tracker.update(rgb)
                 pos = tracker.get_position()
-                
+
                 startX = int(pos.left())
                 startY = int(pos.top())
                 endX = int(pos.right())
@@ -127,9 +128,9 @@ def run(vs, frame_name):
                 rects.append((startX, startY, endX, endY))
 
         cv2.line(frame, (0, H // 2), (W, H // 2), (0, 0, 0), 3)
-        cv2.putText(frame, "-Prediction border - Entrance-", (10, H - ((i * 20) + 200)), 
+        cv2.putText(frame, "-Prediction border - Entrance-", (10, H - ((i * 20) + 200)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-        
+
         objects = ct.update(rects)
 
         for (objectID, centroid) in objects.items():
@@ -143,24 +144,26 @@ def run(vs, frame_name):
                 to.centroids.append(centroid)
 
                 if not to.counted:
+                    global totalUp
+                    global totalDown
                     if direction < 0 and centroid[1] < H // 2:
-                        global totalUp
+                        # global totalUp
                         totalUp += 1
-                        
-                        print(date_class('enter'))
+
+                        # print(date_class('enter'))
                         print(totalUp - totalDown)
-                        
+
                         empty.append(totalUp)
                         to.counted = True
                     elif direction > 0 and centroid[1] > H // 2:
-                        global totalDown
+                        # global totalDown
                         totalDown += 1
-                        
-                        print(date_class('exit'))
+
+                        # print(date_class('exit'))
                         print(totalUp - totalDown)
-                        
+
                         empty1.append(totalDown)
-                        
+
                         if sum(x) >= config.Threshold:
                             cv2.putText(frame, "-ALERT: People limit exceeded-", (10, frame.shape[0] - 80),
                                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 2)
@@ -176,32 +179,35 @@ def run(vs, frame_name):
             text = "ID {}".format(objectID)
             cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-            cv2.circle(frame, (centroid[0], centroid[1]), 4, (255, 255, 255), -1)
+            cv2.circle(
+                frame, (centroid[0], centroid[1]), 4, (255, 255, 255), -1)
 
         info = [
             ("Exit", totalUp),
             ("Enter", totalDown),
             ("Status", status),
         ]
-        
+
         info2 = [
             ("Total people inside", x),
         ]
 
         for (i, (k, v)) in enumerate(info):
             text = "{}: {}".format(k, v)
-            cv2.putText(frame, text, (10, H - ((i * 20) + 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+            cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
 
         for (i, (k, v)) in enumerate(info2):
             text = "{}: {}".format(k, v)
-            cv2.putText(frame, text, (265, H - ((i * 20) + 60)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(frame, text, (265, H - ((i * 20) + 60)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
         cv2.imshow(frame_name, frame)
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord('q'):
             break
-        
+
         totalFrames += 1
         fps.update()
 
@@ -226,6 +232,3 @@ thread1.join()
 thread2.join()
 
 print('end')
-
-
-
