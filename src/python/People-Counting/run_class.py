@@ -14,11 +14,16 @@ import cv2
 import datetime
 from itertools import zip_longest
 import threading
+import json
+import pytz
 
 
 t0 = time.time()
 totalUp = 0
 totalDown = 0
+total = 0
+x = 0
+
 
 
 class date_class:
@@ -38,9 +43,9 @@ def run(vs, frame_name):
             'skip_frames': 15}
 
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-               "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-               "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-               "sofa", "train", "tvmonitor"]
+            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+            "sofa", "train", "tvmonitor"]
 
     net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
@@ -62,11 +67,6 @@ def run(vs, frame_name):
     trackableObjects = {}
 
     totalFrames = 0
-    # totalDown = 0
-    # totalUp = 0
-    x = []
-    empty = []
-    empty1 = []
 
     fps = FPS().start()
 
@@ -146,25 +146,21 @@ def run(vs, frame_name):
                 if not to.counted:
                     global totalUp
                     global totalDown
+                    # global list empty = []
+                    # global list empty1 = []
+                    global x
                     if direction < 0 and centroid[1] < H // 2:
-                        # global totalUp
                         totalUp += 1
 
-                        # print(date_class('enter'))
-                        print(totalUp - totalDown)
+                        print('leave : ' + str(totalDown - totalUp))
 
-                        empty.append(totalUp)
                         to.counted = True
                     elif direction > 0 and centroid[1] > H // 2:
-                        # global totalDown
                         totalDown += 1
 
-                        # print(date_class('exit'))
-                        print(totalUp - totalDown)
-
-                        empty1.append(totalDown)
-
-                        if sum(x) >= config.Threshold:
+                        print('enter : ' + str(totalDown - totalUp))
+                        
+                        if x >= config.Threshold:
                             cv2.putText(frame, "-ALERT: People limit exceeded-", (10, frame.shape[0] - 80),
                                         cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 255), 2)
                             if config.ALERT:
@@ -172,8 +168,7 @@ def run(vs, frame_name):
                                 Mailer().send(config.MAIL)
                                 # print("[INFO] Alert sent")
                         to.counted = True
-                    x = []
-                    x.append(len(empty1)-len(empty))
+                    x = totalDown - totalUp
 
             trackableObjects[objectID] = to
             text = "ID {}".format(objectID)
@@ -219,6 +214,24 @@ def run(vs, frame_name):
         vs.release()
 
     cv2.destroyAllWindows()
+
+
+def get_dict_data(access):
+    global total
+    dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+    # 2018-12-31T05:00:30 という形式
+    time_str = dt_now.isoformat(timespec='seconds')
+    if(access == 'enter'):
+        total += 1
+    elif(access == 'leave'):
+        total -= 1
+
+    dict = {
+        "time_data": time_str,
+        "enter_or_leave": access,
+        "people_count": total
+    }
+    return dict
 
 
 # url = "http://10.10.51.151:8080/?action=stream"
