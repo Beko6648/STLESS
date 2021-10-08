@@ -53,16 +53,16 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
     let people_in_store_queue_control = (time_data, enter_or_leave) => {
-        const date = new Date(time_data);
-        date.setHours(date.getHours() + 9); // JSTに変換するため９時間プラス
+        const arg_date = new Date(time_data);
+        arg_date.setHours(arg_date.getHours() + 9); // JSTに変換するため９時間プラス
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
-            people_in_store_queue.push(date);
+            people_in_store_queue.push(arg_date);
             console.log('people_in_store_queue', people_in_store_queue);
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
-            const leave_time = time_data;
+            const leave_time = arg_date;
 
             shopping_time_queue.push({
                 enter_time: enter_time,
