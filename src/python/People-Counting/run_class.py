@@ -152,13 +152,11 @@ def run(vs, frame_name):
                     if direction < 0 and centroid[1] < H // 2:
                         totalUp += 1
 
-                        print('leave : ' + str(totalDown - totalUp))
-
+                        print(json.dumps(get_dict_data('leave')))
                         to.counted = True
                     elif direction > 0 and centroid[1] > H // 2:
                         totalDown += 1
-
-                        print('enter : ' + str(totalDown - totalUp))
+                        print(json.dumps(get_dict_data('enter')))
                         
                         if x >= config.Threshold:
                             cv2.putText(frame, "-ALERT: People limit exceeded-", (10, frame.shape[0] - 80),
@@ -244,4 +242,4 @@ thread2.start()
 thread1.join()
 thread2.join()
 
-print('end')
+# print('end')
