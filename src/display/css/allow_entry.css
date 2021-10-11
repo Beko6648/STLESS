@@ -23,4 +23,5 @@ body {
 .regulatory_message {
 	height: 100%;
 	font-size: 300%;
+	text-align: center;
 }
