@@ -33,8 +33,8 @@ app.once('ready', () => {
         res.json(next_html);
     });
     // 規制情報表示htmlからのリクエストに対し、待ち時間を格納した配列を返す
-    express_app.get("/api/waiting_time_array", function (req, res, next) {
-        res.json(waiting_time_array);
+    express_app.get("/api/leave_time_array", function (req, res, next) {
+        res.json(leave_time_array);
     });
 
 

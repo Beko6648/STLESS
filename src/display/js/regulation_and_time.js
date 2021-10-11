@@ -14,10 +14,10 @@ $(() => {
         A_xhr.send();
 
         let B_xhr = new XMLHttpRequest();
-        B_xhr.open("GET", "/api/waiting_time_array");
+        B_xhr.open("GET", "/api/leave_time_array");
         B_xhr.addEventListener("load", function (e) {
-            let waiting_time_array = JSON.parse(B_xhr.responseText);
-            console.log(waiting_time_array);
+            let leave_time_array = JSON.parse(B_xhr.responseText);
+            console.log(leave_time_array);
         });
         B_xhr.send();
     }
