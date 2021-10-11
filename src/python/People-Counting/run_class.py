@@ -16,13 +16,14 @@ from itertools import zip_longest
 import threading
 import json
 import pytz
-
+import sys
 
 t0 = time.time()
 total_leave = 0
 total_enter = 0
 total = 0 # get_dictのための変数
 total_people_inside = 0
+entrance_quantity = 0
 
 def run(vs, frame_name):
     # print(frame_name)
