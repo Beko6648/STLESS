@@ -24,23 +24,30 @@ total_enter = 0
 total = 0 # get_dictのための変数
 total_people_inside = 0
 
-
 def run(vs, frame_name):
     # print(frame_name)
-    args = {'prototxt': 'mobilenet_ssd/MobileNetSSD_deploy.prototxt',
-            'model': 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel',
+    # args = {'prototxt': 'mobilenet_ssd/MobileNetSSD_deploy.prototxt',
+    #         'model': 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel',
+    #         'input': 'videos/example_01.mp4',
+    #         'output': None,
+    #         'confidence': 0.4,
+    #         'skip_frames': 15}
+    
+    args = {'prototxt': 'model_data/MobileNetSSD_deploy.prototxt',
+            'model': 'model_data/MobileNetSSD_deploy.caffemodel',
             'input': 'videos/example_01.mp4',
             'output': None,
             'confidence': 0.4,
             'skip_frames': 15}
 
+    
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
             "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
             "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
             "sofa", "train", "tvmonitor"]
-
+    
     net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
-
+    
     if not args.get("input", False):
         # print("[INFO] Starting the live stream..")
         vs = VideoStream(config.url).start()
@@ -49,7 +56,7 @@ def run(vs, frame_name):
         # print("[INFO] Starting the video..")
         # vs = cv2.VideoCapture(args["input"])
         # vs = cv2.VideoCapture(camera_num)
-
+        
     writer = None
     W = None
     H = None
@@ -61,8 +68,9 @@ def run(vs, frame_name):
     totalFrames = 0
 
     fps = FPS().start()
-
+    
     while True:
+        
         frame = vs.read()
         frame = frame[1] if args.get("input", False) else frame
 
@@ -81,7 +89,7 @@ def run(vs, frame_name):
 
         status = "Waiting"
         rects = []
-
+        
         if totalFrames % args["skip_frames"] == 0:
             status = "Detecting"
             trackers = []
@@ -118,7 +126,7 @@ def run(vs, frame_name):
                 endY = int(pos.bottom())
 
                 rects.append((startX, startY, endX, endY))
-
+        
         cv2.line(frame, (0, H // 2), (W, H // 2), (0, 0, 0), 3)
         cv2.putText(frame, "-Prediction border - Entrance-", (10, H - ((i * 20) + 200)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
@@ -166,7 +174,7 @@ def run(vs, frame_name):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
             cv2.circle(
                 frame, (centroid[0], centroid[1]), 4, (255, 255, 255), -1)
-
+        
         info = [
             ("Leave", total_leave),
             ("Enter", total_enter),
