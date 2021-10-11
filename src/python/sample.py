@@ -29,4 +29,4 @@ while True:
         print(json.dumps(get_dict_data('enter')))
     elif(total>0):
         print(json.dumps(get_dict_data('leave')))
-    time.sleep(5)
+    time.sleep(2)
