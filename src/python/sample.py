@@ -25,8 +25,8 @@ def get_dict_data(access):
 # print(json.dumps(get_dict_data('enter')))
 
 while True:
-    # if(random.randint(0,1) == 0):
+    if(random.randint(0,1) == 0):
     print(json.dumps(get_dict_data('enter')))
-    # elif(total>0):
-        # print(json.dumps(get_dict_data('leave')))
+    elif(total>0):
+        print(json.dumps(get_dict_data('leave')))
     time.sleep(2)
