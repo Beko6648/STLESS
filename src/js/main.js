@@ -15,7 +15,7 @@ let regulation_nearing_ratio = 0.9; // 規制間近とする人数割合
 // 変数の初期化
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
-let max_people_in_store = 4; // 店舗最大許容人数
+let max_people_in_store = 8; // 店舗最大許容人数
 let waiting_time_estimation_data = { hour: 0, minute: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
@@ -39,8 +39,8 @@ app.once('ready', () => {
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    // let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
-    let pyshell = new PythonShell(path.join(__dirname, '../python/People-Counting/run_class.py'), { mode: 'json', pythonOptions: ['-u'] });
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
+    // let pyshell = new PythonShell(path.join(__dirname, '../python/People-Counting/run_class.py'), { mode: 'json', pythonOptions: ['-u'] });
 
     console.log('init_pyshell');
 

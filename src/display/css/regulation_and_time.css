@@ -31,3 +31,13 @@ body {
 	font-size: 300%;
 	text-align: center;
 }
+
+.waiting_time_display {
+	height: 100%;
+	font-size: 300%;
+	text-align: center;
+}
+
+.waiting_time {
+	margin-top: 20px;
+}

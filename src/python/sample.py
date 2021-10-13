@@ -22,11 +22,19 @@ def get_dict_data(access):
     }
     return dict
 
-# print(json.dumps(get_dict_data('enter')))
+
 
 while True:
-    if(random.randint(0,1) == 0):
+    for i in range(10):
         print(json.dumps(get_dict_data('enter')))
-    elif(total>0):
+        
+    time.sleep(10)
+
+    for i in range(10):
         print(json.dumps(get_dict_data('leave')))
-    time.sleep(2)
+    
+    # if(random.randint(0,1) == 0):
+    #     print(json.dumps(get_dict_data('enter')))
+    # elif(total>0):
+    #     print(json.dumps(get_dict_data('leave')))
+    # time.sleep(2)
