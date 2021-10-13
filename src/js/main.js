@@ -15,7 +15,7 @@ let regulation_nearing_ratio = 0.9; // 規制間近とする人数割合
 // 変数の初期化
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
-let max_people_in_store = 8; // 店舗最大許容人数
+let max_people_in_store = 10; // 店舗最大許容人数
 let waiting_time_estimation_data = { hour: 0, minute: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
@@ -58,7 +58,8 @@ app.once('ready', () => {
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(arg_date);
-            console.log('people_in_store_queue', people_in_store_queue);
+            // console.log('people_in_store_queue', people_in_store_queue);
+            console.log('店内人数', people_in_store_queue.length);
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
@@ -69,8 +70,8 @@ app.once('ready', () => {
                 leave_time: leave_time
             })
 
-            console.log('people_in_store_queue', people_in_store_queue);
-            console.log('shopping_time_queue', shopping_time_queue);
+            // console.log('people_in_store_queue', people_in_store_queue);
+            // console.log('shopping_time_queue', shopping_time_queue);
         } else {
             console.log('enterかleaveを入力してください');
         }
@@ -80,7 +81,7 @@ app.once('ready', () => {
     let regulatory_process = (people_count) => {
         if (max_people_in_store <= people_count) { // 規制する場合
             let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間
-            console.log('first_three_in_line', first_three_in_line);
+            // console.log('first_three_in_line', first_three_in_line);
 
             // 3人分の入店時間に待ち時間推測用データを加算し、規制表示関数へ引き渡す
             leave_time_array = first_three_in_line.map((value) => {
@@ -92,7 +93,7 @@ app.once('ready', () => {
 
                 return entry_date.toISOString();
             })
-            console.log('leave_time_array', leave_time_array);
+            // console.log('leave_time_array', leave_time_array);
             next_html = 'regulation_and_time.html';
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             next_html = 'regulation_nearing.html';

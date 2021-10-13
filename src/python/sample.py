@@ -27,11 +27,12 @@ def get_dict_data(access):
 while True:
     for i in range(10):
         print(json.dumps(get_dict_data('enter')))
-        
-    time.sleep(10)
+        time.sleep(1)
+    time.sleep(5)
 
     for i in range(10):
         print(json.dumps(get_dict_data('leave')))
+        time.sleep(1)
     
     # if(random.randint(0,1) == 0):
     #     print(json.dumps(get_dict_data('enter')))
