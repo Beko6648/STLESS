@@ -51,7 +51,7 @@ app.once('ready', () => {
     // ウィンドウを開く
     store_window = new BrowserWindow({
         show: false,
-        backgroundColor: '#FFF',
+        backgroundColor: '#333333',
         width: 800,
         height: 500,
         title: 'STLESS',
@@ -73,6 +73,7 @@ app.once('ready', () => {
             console.log(results);
         });
         store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+
     } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
         store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html.html'));
     }
