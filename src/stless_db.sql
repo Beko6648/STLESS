@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: 127.0.0.1
--- 生成日時: 2021-10-15 03:37:51
+-- 生成日時: 2021-10-15 12:49:05
 -- サーバのバージョン： 10.4.21-MariaDB
 -- PHP のバージョン: 8.0.11
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `shopping_time_data_table` (
   `id` int(11) NOT NULL,
-  `store_id` int(11) NOT NULL,
+  `store_id` varchar(26) NOT NULL,
   `shopping_date` date NOT NULL,
   `shopping_time` time NOT NULL,
   `time_zone` int(11) NOT NULL
@@ -42,7 +42,7 @@ CREATE TABLE `shopping_time_data_table` (
 --
 
 CREATE TABLE `store_table` (
-  `id` int(11) NOT NULL,
+  `id` varchar(26) NOT NULL,
   `data_transfer_flag` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -51,7 +51,7 @@ CREATE TABLE `store_table` (
 --
 
 INSERT INTO `store_table` (`id`, `data_transfer_flag`) VALUES
-(1, 0);
+('01FJ1S0RGWP32Z4NZ3KPZQ2SXZ', 0);
 
 --
 -- ダンプしたテーブルのインデックス
@@ -79,12 +79,6 @@ ALTER TABLE `store_table`
 --
 ALTER TABLE `shopping_time_data_table`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- テーブルの AUTO_INCREMENT `store_table`
---
-ALTER TABLE `store_table`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- ダンプしたテーブルの制約

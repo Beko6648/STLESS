@@ -4,6 +4,7 @@ const store = new Store();
 const path = require('path');
 const { PythonShell } = require('python-shell');
 const moment = require("moment");
+const ULID = require('ulid')
 const express = require('express');
 const express_app = express();
 const port = 3000;
@@ -28,6 +29,27 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 // アプリの起動準備が完了したら
 app.once('ready', () => {
 
+    // 設定の保存場所を表示
+    console.log(store.path);
+    // テスト用：設定情報をクリアする
+    // store.clear();
+
+    // mysqlへの接続
+    let connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'stless_db'
+    });
+
+
+    connection.connect();
+
+    connection.query('SELECT * FROM store_table', function (error, results, fields) {
+        if (error) throw error;
+        console.log(results[0]);
+    });
+
     // ウィンドウを開く
     store_window = new BrowserWindow({
         show: false,
@@ -42,6 +64,20 @@ app.once('ready', () => {
             backgroundThrottling: false,
         }
     });
+
+    // 店舗IDが保存されているか確認する
+    if (!store.has('store_id')) {
+        // 店舗IDの新規生成、自身の店舗IDを保存する
+        const store_id = ULID.ulid();
+        store.set('store_id', store_id);
+        connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
+            if (error) throw error;
+            console.log(results);
+        });
+
+        connection.end();
+        store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+    }
     store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
 
     // 読み込みが完了してからウィンドウを表示する
@@ -50,23 +86,6 @@ app.once('ready', () => {
     });
 
 
-
-    // mysqlへの接続
-    var connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'stless_db'
-    });
-
-    connection.connect();
-
-    connection.query('SELECT * FROM store_table', function (error, results, fields) {
-        if (error) throw error;
-        console.log(results[0]);
-    });
-
-    connection.end();
 
     // 規制情報表示ディスプレイのためにhttpサーバを立てる
     express_app.use(express.static(path.join(__dirname, '../display')));
