@@ -1,12 +1,11 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { PythonShell } = require('python-shell');
-
+const moment = require("moment");
 const express = require('express');
 const express_app = express();
 const port = 3000;
-
-var mysql = require('mysql');
+const mysql = require('mysql');
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -72,12 +71,10 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
     let people_in_store_queue_control = (time_data, enter_or_leave) => {
-        const arg_date = new Date(time_data);
-        arg_date.setHours(arg_date.getHours() + 9); // JSTに変換するため９時間プラス
+        const arg_date = moment(time_data);
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(arg_date);
-            // console.log('people_in_store_queue', people_in_store_queue);
             console.log('people_in_store_cnt', people_in_store_queue.length);
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
@@ -104,11 +101,11 @@ app.once('ready', () => {
 
             // 3人分の入店時間に待ち時間推測用データを加算し、規制表示関数へ引き渡す
             leave_time_array = first_three_in_line.map((value) => {
-                let entry_date = new Date(value); // 格納されていた入店時間データ
+                let entry_date = moment(value); // 格納されていた入店時間データ
 
                 // 待ち時間推測用データ（平均買い物時間）を加算する
-                entry_date.setHours(entry_date.getHours() + waiting_time_estimation_data.hour);
-                entry_date.setMinutes(entry_date.getMinutes() + waiting_time_estimation_data.minute);
+                entry_date.add(waiting_time_estimation_data.hour, 'hours');
+                entry_date.add(waiting_time_estimation_data.minute, 'minutes');
 
                 return entry_date.toISOString();
             })

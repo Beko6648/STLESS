@@ -22,15 +22,14 @@ $(() => {
             console.log(leave_time_array);
 
             leave_time_array.forEach((value, index) => {
-                let leave_date = new Date(value);
-                let now_date = new Date();
-                now_date.setHours(now_date.getHours() + 9);
+                let leave_date = moment(value);
+                let now_date = moment();
 
-                console.log('予想退店時間', leave_date.toISOString());
-                console.log('現在時間', now_date.toISOString());
+                console.log('予想退店時間', leave_date.format('HH:mm:ss'));
+                console.log('現在時間', now_date.format('HH:mm:ss'));
 
-                // 差分がミリ秒で出てくるため、分数に直す
-                let waiting_time = Math.round((leave_date.getTime() - now_date.getTime()) / 60000);
+                // 差分の分数を計算
+                let waiting_time = Math.round(leave_date.diff(now_date, 'minutes'));
                 if (waiting_time <= 1) {
                     $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`)
                 } else {
