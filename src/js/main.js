@@ -1,9 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { PythonShell } = require('python-shell');
+
 const express = require('express');
 const express_app = express();
 const port = 3000;
+
+var mysql = require('mysql');
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -23,6 +26,22 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 
 // アプリの起動準備が完了したら
 app.once('ready', () => {
+    // mysqlへの接続
+    var connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'stless_db'
+    });
+
+    connection.connect();
+
+    connection.query('SELECT * FROM store_table', function (error, results, fields) {
+        if (error) throw error;
+        console.log(results[0]);
+    });
+
+    connection.end();
 
     // 規制情報表示ディスプレイのためにhttpサーバを立てる
     express_app.use(express.static(path.join(__dirname, '../display')));
@@ -59,7 +78,7 @@ app.once('ready', () => {
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(arg_date);
             // console.log('people_in_store_queue', people_in_store_queue);
-            console.log('店内人数', people_in_store_queue.length);
+            console.log('people_in_store_cnt', people_in_store_queue.length);
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
@@ -101,11 +120,6 @@ app.once('ready', () => {
             next_html = 'allow_entry.html';
         }
     }
-
-
-    // let display_regulation_without_time = () => { // 規制（待ち時間表示なし）
-    //     next_html = 'regulation_without_time.html';
-    // }
 
 
     // ウィンドウを開く
