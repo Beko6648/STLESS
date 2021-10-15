@@ -32,7 +32,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log(store.path);
     // テスト用：設定情報をクリアする
-    // store.clear();
+    store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -42,8 +42,6 @@ app.once('ready', () => {
         database: 'stless_db'
     });
 
-
-    connection.connect();
 
     connection.query('SELECT * FROM store_table', function (error, results, fields) {
         if (error) throw error;
@@ -65,20 +63,19 @@ app.once('ready', () => {
         }
     });
 
-    // 店舗IDが保存されているか確認する
+    // 店舗IDが保存されていなければ、生成
     if (!store.has('store_id')) {
-        // 店舗IDの新規生成、自身の店舗IDを保存する
+        // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
         store.set('store_id', store_id);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             console.log(results);
         });
-
-        connection.end();
         store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+    } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
+        store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html.html'));
     }
-    store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
 
     // 読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
