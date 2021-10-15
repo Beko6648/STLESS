@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const Store = require('electron-store');
+const store = new Store();
 const path = require('path');
 const { PythonShell } = require('python-shell');
 const moment = require("moment");
@@ -133,7 +135,7 @@ app.once('ready', () => {
             backgroundThrottling: false,
         }
     });
-    testWindow.loadFile(path.join(__dirname, '../html/page_test.html'));
+    testWindow.loadFile(path.join(__dirname, '../store/html/page_test.html'));
 
     // 読み込みが完了してからウィンドウを表示する
     testWindow.once('ready-to-show', () => {
