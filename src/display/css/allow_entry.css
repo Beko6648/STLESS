@@ -1,32 +1,4 @@
+@import url("./all_page.css");
 html {
-	height: 100%;
 	background-color: #00a03e;
-	@font-face {
-		font-family: "DotGothic";
-		src: url("../../fonts/DotGothic16-Regular.ttf") format("truetype");
-	}
-}
-
-body {
-	height: 100%;
-}
-
-.regulatory_info {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.regulatory_icon {
-	height: 100%;
-	font-size: 2000%;
-}
-
-.regulatory_message {
-	font-family: "DotGothic";
-	height: 100%;
-	font-size: 300%;
-	text-align: center;
 }

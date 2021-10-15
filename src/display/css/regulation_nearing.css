@@ -1,26 +1,4 @@
+@import url('./all_page.css');
 html {
 	background-color: #f9c00c;
-}
-
-body {
-	height: 100%;
-}
-
-.regulatory_info {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.regulatory_icon {
-	height: 100%;
-	font-size: 2000%;
-}
-
-.regulatory_message {
-	height: 100%;
-	font-size: 300%;
-	text-align: center;
 }

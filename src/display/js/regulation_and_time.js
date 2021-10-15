@@ -16,8 +16,27 @@ $(() => {
         let B_xhr = new XMLHttpRequest();
         B_xhr.open("GET", "/api/leave_time_array");
         B_xhr.addEventListener("load", function (e) {
+            $('.waiting_time_display').html('');
+
             let leave_time_array = JSON.parse(B_xhr.responseText);
             console.log(leave_time_array);
+
+            leave_time_array.forEach((value, index) => {
+                let leave_date = new Date(value);
+                let now_date = new Date();
+                now_date.setHours(now_date.getHours() + 9);
+
+                console.log('予想退店時間', leave_date.toISOString());
+                console.log('現在時間', now_date.toISOString());
+
+                // 差分がミリ秒で出てくるため、分数に直す
+                let waiting_time = Math.round((leave_date.getTime() - now_date.getTime()) / 60000);
+                if (waiting_time <= 1) {
+                    $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`)
+                } else {
+                    $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`)
+                }
+            })
         });
         B_xhr.send();
     }

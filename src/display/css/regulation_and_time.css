@@ -1,17 +1,10 @@
+@import url("./all_page.css");
 html {
 	background-color: #d20303;
 }
 
 body {
 	height: 100%;
-}
-
-.regulatory_info {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
 }
 
 .icon_and_time_container {
@@ -21,13 +14,12 @@ body {
 	align-items: center;
 }
 
-.regulatory_icon {
-	height: 100%;
-	font-size: 2000%;
-}
-
-.regulatory_message {
+.waiting_time_display {
 	height: 100%;
 	font-size: 300%;
 	text-align: center;
+}
+
+.waiting_time {
+	margin-top: 20px;
 }
