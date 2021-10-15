@@ -1,5 +1,10 @@
+@font-face {
+	font-family: "DotGothic";
+	src: url(../fonts/DotGothic16-Regular.ttf);
+}
+
 html {
-	font-family: Impact;
+	font-family: DotGothic;
 }
 
 body {
@@ -16,11 +21,11 @@ body {
 
 .regulatory_icon {
 	height: 100%;
-	font-size: 2000%;
+	font-size: 2500%;
 }
 
 .regulatory_message {
 	height: 100%;
-	font-size: 300%;
+	font-size: 400%;
 	text-align: center;
 }
