@@ -27,6 +27,30 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 
 // アプリの起動準備が完了したら
 app.once('ready', () => {
+
+    // ウィンドウを開く
+    store_window = new BrowserWindow({
+        show: false,
+        backgroundColor: '#FFF',
+        width: 800,
+        height: 500,
+        title: 'STLESS',
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            pageVisibility: true,
+            backgroundThrottling: false,
+        }
+    });
+    store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+
+    // 読み込みが完了してからウィンドウを表示する
+    store_window.once('ready-to-show', () => {
+        store_window.show();
+    });
+
+
+
     // mysqlへの接続
     var connection = mysql.createConnection({
         host: 'localhost',
@@ -64,6 +88,7 @@ app.once('ready', () => {
 
     console.log('init_pyshell');
 
+    // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     pyshell.on('message', function (data) {
         // console.log('data', data);
         people_in_store_queue_control(data.time_data, data.enter_or_leave);
@@ -119,26 +144,4 @@ app.once('ready', () => {
             next_html = 'allow_entry.html';
         }
     }
-
-
-    // ウィンドウを開く
-    testWindow = new BrowserWindow({
-        show: false,
-        backgroundColor: '#FFF',
-        width: 800,
-        height: 500,
-        title: 'テストウィンドウ',
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            pageVisibility: true,
-            backgroundThrottling: false,
-        }
-    });
-    testWindow.loadFile(path.join(__dirname, '../store/html/page_test.html'));
-
-    // 読み込みが完了してからウィンドウを表示する
-    testWindow.once('ready-to-show', () => {
-        testWindow.show();
-    });
 });
