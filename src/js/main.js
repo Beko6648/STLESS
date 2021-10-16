@@ -43,12 +43,7 @@ app.once('ready', () => {
     });
 
 
-    connection.query('SELECT * FROM store_table', function (error, results, fields) {
-        if (error) throw error;
-        console.log(results[0]);
-    });
-
-    // ウィンドウを開く
+    // ウィンドウの設定
     store_window = new BrowserWindow({
         show: false,
         backgroundColor: '#333333',
@@ -63,7 +58,7 @@ app.once('ready', () => {
         }
     });
 
-    // 店舗IDが保存されていなければ、生成
+    // 店舗IDが保存されていなければ
     if (!store.has('store_id')) {
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
@@ -72,13 +67,14 @@ app.once('ready', () => {
             if (error) throw error;
             console.log(results);
         });
+        // 初期設定としてカメラ設定画面を表示する
         store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
 
     } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
         store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html.html'));
     }
 
-    // 読み込みが完了してからウィンドウを表示する
+    // ウィンドウの読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
         store_window.show();
     });
@@ -129,9 +125,6 @@ app.once('ready', () => {
                 enter_time: enter_time,
                 leave_time: leave_time
             })
-
-            // console.log('people_in_store_queue', people_in_store_queue);
-            // console.log('shopping_time_queue', shopping_time_queue);
         } else {
             console.log('enterかleaveを入力してください');
         }
@@ -140,10 +133,9 @@ app.once('ready', () => {
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
         if (max_people_in_store <= people_count) { // 規制する場合
-            let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間
-            // console.log('first_three_in_line', first_three_in_line);
+            let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
 
-            // 3人分の入店時間に待ち時間推測用データを加算し、規制表示関数へ引き渡す
+            // 3人分の入店時間に待ち時間推測用データを加算し、規制表示の内容を決定する
             leave_time_array = first_three_in_line.map((value) => {
                 let entry_date = moment(value); // 格納されていた入店時間データ
 
@@ -153,7 +145,6 @@ app.once('ready', () => {
 
                 return entry_date.toISOString();
             })
-            // console.log('leave_time_array', leave_time_array);
             next_html = 'regulation_and_time.html';
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             next_html = 'regulation_nearing.html';
