@@ -30,9 +30,9 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 app.once('ready', () => {
 
     // 設定の保存場所を表示
-    console.log(store.path);
+    console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    store.clear();
+    // store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -62,17 +62,18 @@ app.once('ready', () => {
     if (!store.has('store_id')) {
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
-        store.set('store_id', store_id);
+        // store.set('store_id', store_id);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             console.log(results);
         });
         // 初期設定としてカメラ設定画面を表示する
         store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
-
     } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
-        store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html.html'));
+        store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     }
+    // 開発者ツールウィンドウを表示する
+    store_window.webContents.openDevTools();
 
     // ウィンドウの読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
@@ -115,7 +116,6 @@ app.once('ready', () => {
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(arg_date);
-            console.log('people_in_store_cnt', people_in_store_queue.length);
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
@@ -128,6 +128,7 @@ app.once('ready', () => {
         } else {
             console.log('enterかleaveを入力してください');
         }
+        console.log('店内客数', people_in_store_queue.length);
     }
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
