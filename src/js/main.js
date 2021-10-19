@@ -162,3 +162,15 @@ ipcMain.handle('goto_regulatory_info_view', (event, message) => {
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     return true;
 })
+
+ipcMain.handle('goto_system_setting', (event, message) => {
+    console.log(message);
+    store_window.loadFile(path.join(__dirname, '../store_process/html/system_setting.html'));
+    return true;
+})
+
+ipcMain.handle('goto_camera_setting', (event, message) => {
+    console.log(message);
+    store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+    return true;
+})
