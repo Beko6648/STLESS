@@ -63,7 +63,7 @@ app.once('ready', () => {
     if (!store.has('store_id')) {
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
-        // store.set('store_id', store_id);
+        store.set('store_id', store_id);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             console.log(results);
