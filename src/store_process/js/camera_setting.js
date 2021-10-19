@@ -1,4 +1,5 @@
 window.jQuery = window.$ = require('jquery');
+const { ipcRenderer } = require('electron');
 const Store = require('electron-store');
 const store = new Store();
 
@@ -65,5 +66,11 @@ $(() => {
         store.set('entrance_name_and_ip_array', entrance_name_and_ip_array);
         saved_entrance_name_and_ip_array = entrance_name_and_ip_array;
         console.log(entrance_name_and_ip_array);
+
+        // メインプロセスへ規制情報表示画面へのページ遷移を依頼する
+        (async () => {
+            const data = await ipcRenderer.invoke('goto_regulatory_info_view', 'goto_regulatory_info_view:fromCamera_setting');
+            console.log('goto_regulatory_info_view', data);
+        })()
     })
 })

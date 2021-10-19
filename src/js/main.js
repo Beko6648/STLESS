@@ -18,6 +18,7 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 let regulation_nearing_ratio = 0.9; // 規制間近とする人数割合
 
 // 変数の初期化
+let store_window = null;
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
 let max_people_in_store = 10; // 店舗最大許容人数
@@ -154,3 +155,10 @@ app.once('ready', () => {
         }
     }
 });
+
+// カメラ設定画面から規制情報表示画面へ遷移させる処理
+ipcMain.handle('goto_regulatory_info_view', (event, message) => {
+    console.log(message);
+    store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
+    return true;
+})
