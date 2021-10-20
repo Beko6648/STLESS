@@ -21,10 +21,13 @@ let regulation_nearing_ratio = 0.9; // 規制間近とする人数割合
 let store_window = null;
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
-let max_people_in_store = 10; // 店舗最大許容人数
 let waiting_time_estimation_data = { hour: 0, minute: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
+let max_people_in_store = 10; // 店舗最大許容人数
+if (store.has('max_people_in_store')) {
+    max_people_in_store = store.get('max_people_in_store');
+}
 
 
 // アプリの起動準備が完了したら
@@ -109,6 +112,10 @@ app.once('ready', () => {
     express_app.use(express.static(path.join(__dirname, '../display')));
     express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
+    // 規制情報表示にディスプレイ設定を引き渡す
+    express_app.get("/api/display_setting", function (req, res, next) {
+        res.json(store.get('display_setting'));
+    });
     // 規制情報表示htmlからのリクエストに対し、次に表示するhtml情報を返す
     express_app.get("/api/next_html", function (req, res, next) {
         res.json(next_html);
