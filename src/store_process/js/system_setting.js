@@ -51,6 +51,7 @@ $(() => {
 
 
         (async () => {
+            await ipcRenderer.invoke('update_setting', 'update_setting :fromSystem_setting');
             const data = await ipcRenderer.invoke('goto_regulatory_info_view', 'goto_regulatory_info_view :fromSystem_setting');
             console.log('goto_regulatory_info_view ', data);
         })()

@@ -24,9 +24,9 @@ let shopping_time_queue = []; // 入退店データキュー入店時間,退店�
 let waiting_time_estimation_data = { hour: 0, minute: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
-let max_people_in_store = 10; // 店舗最大許容人数
-if (store.has('max_people_in_store')) {
-    max_people_in_store = store.get('max_people_in_store');
+let max_people_in_store = null; // 店舗最大許容人数
+if (store.has('system_setting')) {
+    max_people_in_store = store.get('system_setting').max_people_in_store;
 }
 
 
@@ -163,6 +163,7 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
+        console.log('max_people_in_store', max_people_in_store);
         if (max_people_in_store <= people_count) { // 規制する場合
             let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
 
@@ -177,10 +178,13 @@ app.once('ready', () => {
                 return entry_date.toISOString();
             })
             next_html = 'regulation_and_time.html';
+            console.log('規制');
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             next_html = 'regulation_nearing.html';
+            console.log('規制間近');
         } else {
             next_html = 'allow_entry.html';
+            console.log('許可');
         }
     }
 });
@@ -201,5 +205,13 @@ ipcMain.handle('goto_system_setting', (event, message) => {
 ipcMain.handle('goto_camera_setting', (event, message) => {
     console.log(message);
     store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+    return true;
+})
+
+ipcMain.handle('update_setting', (event, message) => {
+    console.log(message);
+    if (store.has('system_setting')) {
+        max_people_in_store = store.get('system_setting').max_people_in_store;
+    }
     return true;
 })

@@ -13,7 +13,7 @@ $(() => {
         display_setting = JSON.parse(xhr.responseText);
         console.log(display_setting);
         $('.regulatory_icon').html(display_setting.regulation_card.icon_input);
-        $('.regulatory_message').html(`${display_setting.regulation_card.title_input}<br>${display_setting.allow_card.subtitle_input}`);
+        $('.regulatory_message').html(`${display_setting.regulation_card.title_input}<br>${display_setting.regulation_card.subtitle_input}`);
 
         // アニメーションで使用するコンテナとパラメータを宣言する
         animContainer = document.getElementById('lottie');
