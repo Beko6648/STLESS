@@ -47,7 +47,7 @@ app.once('ready', () => {
     // ウィンドウの設定
     store_window = new BrowserWindow({
         show: false,
-        backgroundColor: '#333333',
+        backgroundColor: '#F8F9FA',
         width: 800,
         height: 500,
         title: 'STLESS',

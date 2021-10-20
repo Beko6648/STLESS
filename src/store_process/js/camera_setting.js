@@ -28,7 +28,6 @@ $(() => {
 
     // 出入り口数が保存されていたら初期値を上書き、保存されていなければ初期値として1を入力
     if (store.has('number_of_entrance')) {
-        console.log('出入り口数が保存されていたら初期値を上書き');
         saved_number_of_entrance = store.get('number_of_entrance');
         $('#number_of_entrance').val(saved_number_of_entrance);
     } else {
@@ -37,7 +36,6 @@ $(() => {
 
     // 各出入り口の名前とIPが保存されていれば初期値として表示
     if (store.has('entrance_name_and_ip_array')) {
-        console.log('各出入り口の名前とIPが保存されていれば初期値として表示');
         saved_entrance_name_and_ip_array = store.get('entrance_name_and_ip_array');
     }
 
