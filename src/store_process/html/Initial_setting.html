@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/initial_setting.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="../js/initial_setting.js"></script>
+</head>
+
+<body>
+    <h1>initial_setting</h1>
+    <div id="system_setting_container">
+        <div id="system_start_and_end_time_setting">
+            システム開始時刻:
+            <input type="time" id="system_start_time_input">
+            システム終了時刻:
+            <input type="time" id="system_end_time_input">
+        </div>
+        <div id="max_people_in_store">
+            店内上限人数:
+            <input type="number" id="max_people_in_store_input">
+        </div>
+    </div>
+    <input type="number" name="number_of_entrance" id="number_of_entrance">
+    <div id="camera_ip_container"></div>
+    <button id="end_camera_setting_button">設定を完了して規制情報表示画面へ</button>
+</body>
+
+</html>

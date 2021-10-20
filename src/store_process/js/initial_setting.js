@@ -62,6 +62,13 @@ $(() => {
         store.set('camera_setting', camera_setting);
         console.log(entrance_name_and_ip_array);
 
+        const system_setting = {
+            max_people_in_store: $('#max_people_in_store_input').val(),
+            system_start_time: $('#system_start_time_input').val(),
+            system_end_time: $('#system_end_time_input').val()
+        }
+        store.set('system_setting', system_setting);
+
         // メインプロセスへ規制情報表示画面へのページ遷移を依頼する
         (async () => {
             const data = await ipcRenderer.invoke('goto_regulatory_info_view', 'goto_regulatory_info_view:fromCamera_setting');

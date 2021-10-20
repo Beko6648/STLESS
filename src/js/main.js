@@ -65,7 +65,7 @@ app.once('ready', () => {
         const store_id = ULID.ulid();
         store.set('store_id', store_id);
         // 規制情報表示ディスプレイの初期設定を行う
-        const system_setting = {
+        const display_setting = {
             "allow_card": {
                 "color_input": "#00a03e",
                 "icon_input": "👍",
@@ -85,13 +85,13 @@ app.once('ready', () => {
                 "subtitle_input": "間隔を空けてお待ち下さい"
             }
         }
-        store.set('system_setting', system_setting);
+        store.set('display_setting', display_setting);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             console.log(results);
         });
         // 初期設定としてカメラ設定画面を表示する
-        store_window.loadFile(path.join(__dirname, '../store_process/html/camera_setting.html'));
+        store_window.loadFile(path.join(__dirname, '../store_process/html/initial_setting.html'));
     } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
         store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     }
