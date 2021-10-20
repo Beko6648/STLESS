@@ -33,7 +33,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    // store.clear();
+    store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -59,11 +59,33 @@ app.once('ready', () => {
         }
     });
 
-    // 店舗IDが保存されていなければ
+    // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
         store.set('store_id', store_id);
+        // 規制情報表示ディスプレイの初期設定を行う
+        const system_setting = {
+            "allow_card": {
+                "color_input": "#00a03e",
+                "icon_input": "👍",
+                "title_input": "いらっしゃいませ",
+                "subtitle_input": "どうぞお入りください"
+            },
+            "near_card": {
+                "color_input": "#f9c00c",
+                "icon_input": "⚠",
+                "title_input": "ご入店いただけます",
+                "subtitle_input": "必要最低限の人数でご入店ください"
+            },
+            "regulation_card": {
+                "color_input": "#d20303",
+                "icon_input": "✋",
+                "title_input": "入店規制中です",
+                "subtitle_input": "間隔を空けてお待ち下さい"
+            }
+        }
+        store.set('system_setting', system_setting);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             console.log(results);
