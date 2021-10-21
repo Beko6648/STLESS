@@ -24,7 +24,21 @@ $(() => {
         console.log('number_of_people', number_of_people);
         console.log('regulatory_status', regulatory_status);
 
+        switch (regulatory_status) {
+            case 'allow_entry.html':
+                $('#regulatory_status').html('入店許可');
+                break;
+            case 'regulation_nearing.html':
+                $('#regulatory_status').html('規制間近');
+                break;
+            case 'regulation_and_time.html':
+                $('#regulatory_status').html('入店規制');
+                break;
+
+            default:
+                break;
+        }
+
         $('#number_of_people').html(number_of_people);
-        $('#regulatory_status').html(regulatory_status);
     })
 })
