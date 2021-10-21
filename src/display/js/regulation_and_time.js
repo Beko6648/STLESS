@@ -37,10 +37,11 @@ $(() => {
 
 
     const api_access = () => {
-        let A_xhr = new XMLHttpRequest();
-        A_xhr.open("GET", "/api/next_html");
-        A_xhr.addEventListener("load", function (e) {
-            next_html = JSON.parse(A_xhr.responseText);
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/next_html_and_leave_time_array");
+        xhr.addEventListener("load", function (e) {
+            let leave_time_array = [];
+            [next_html, leave_time_array] = JSON.parse(xhr.responseText);
             console.log(next_html);
             if (displaying_URL != next_html) {
                 switch (next_html) {
@@ -60,6 +61,7 @@ $(() => {
                     default:
                         break;
                 }
+
                 anim.setDirection(-1);
                 anim.play();
                 body.classList.remove("open");
@@ -68,17 +70,9 @@ $(() => {
                     window.location.assign(next_html);
                 })
             }
-        });
-        A_xhr.send();
 
-        let B_xhr = new XMLHttpRequest();
-        B_xhr.open("GET", "/api/leave_time_array");
-        B_xhr.addEventListener("load", function (e) {
-            $('.waiting_time_display').html('');
-
-            let leave_time_array = JSON.parse(B_xhr.responseText);
             console.log(leave_time_array);
-
+            $('.waiting_time_display').html('');
             leave_time_array.forEach((value, index) => {
                 let leave_date = moment(value);
                 let now_date = moment();
@@ -95,7 +89,7 @@ $(() => {
                 }
             })
         });
-        B_xhr.send();
+        xhr.send();
     }
 
     setInterval(api_access, 1000);
