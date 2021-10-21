@@ -64,6 +64,7 @@ $(() => {
 
                 anim.setDirection(-1);
                 anim.play();
+                $('.regulatory_info').removeClass('open');
                 $('.regulatory_info').addClass('close');
                 anim.onLoopComplete = (() => {
                     anim.stop();
@@ -88,6 +89,10 @@ $(() => {
                     $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`)
                 }
             })
+
+            if (!$('.regulatory_info').hasClass('open')) {
+                $('.regulatory_info').addClass('open');
+            }
         });
         xhr.send();
     }

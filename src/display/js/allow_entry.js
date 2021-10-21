@@ -32,6 +32,7 @@ $(() => {
 
         // bodyMovinアニメーションの読み込み
         anim = lottie.loadAnimation(params);
+        $('.regulatory_info').addClass('open');
 
     });
     xhr.send();
@@ -63,6 +64,7 @@ $(() => {
                 }
                 anim.setDirection(-1);
                 anim.play();
+                $('.regulatory_info').removeClass('open');
                 $('.regulatory_info').addClass('close');
                 anim.onLoopComplete = (() => {
                     anim.stop();
