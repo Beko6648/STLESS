@@ -12,6 +12,7 @@ $(() => {
     xhr.addEventListener("load", function (e) {
         display_setting = JSON.parse(xhr.responseText);
         console.log(display_setting);
+        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
         $('.regulatory_icon').html(display_setting.regulation_card.icon_input);
         $('.regulatory_message').html(`${display_setting.regulation_card.title_input}<br>${display_setting.regulation_card.subtitle_input}`);
 
@@ -98,23 +99,4 @@ $(() => {
     }
 
     setInterval(api_access, 1000);
-
-
-    // ボディにクラスを追加し、CSSでテキストにトランジションをかける
-    var body = document.body;
-    body.classList.add("open");
-
-    // アニメーションが完了したときのbodymovinイベントリスナー（アニメーションは自動で開始されます）モーダルを開いた場合は 
-    // anim.addEventListener("complete", function () {
-    // if (anim.playDirection == -1) {
-    //     // モーダルが閉じられたので、モーダルを再び開くための余分なトリガーを用意する代わりに、アニメーションを再開します（単なるデモのため）。
-    //     anim.setDirection(1);
-    //     anim.play();
-    //     body.classList.remove("completed");
-    // } else {
-    //     // モーダルが開いているので、コンテンツの遷移がトリガーされる
-    //     body.classList.add("open");
-    //     body.classList.add("completed");
-    // }
-    // });
 })
