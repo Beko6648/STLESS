@@ -42,7 +42,7 @@ body {
 
 .regulatory_info {
 	height: 80%;
-	width: 80%;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -54,8 +54,12 @@ body {
 }
 
 .regulatory_message {
+	width: 100%;
 	font-size: 400%;
 	text-align: center;
 	margin-top: 1%;
 	margin-bottom: 10%;
+
+	font-weight: 900;
+	text-shadow: 0 1px 0 whitesmoke;
 }
