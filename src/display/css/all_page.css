@@ -47,6 +47,17 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+
+	opacity: 1;
+	transform: scale(1) translate3D(0, 0, 0);
+}
+
+.close {
+	opacity: 0;
+	transform: scale(0.3) translate3D(0, -20px, 0);
+	/* transition: opacity 0.2s, transform 0.8s cubic-bezier(0.09, 0.52, 0.25, 1); */
+	transition: opacity 0.3s, transform 0.8s cubic-bezier(0.09, 0.52, 0.25, 1);
+	text-align: center;
 }
 
 .regulatory_icon {

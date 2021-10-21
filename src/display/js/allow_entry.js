@@ -63,7 +63,7 @@ $(() => {
                 }
                 anim.setDirection(-1);
                 anim.play();
-                body.classList.remove("open");
+                $('.regulatory_info').addClass('close');
                 anim.onLoopComplete = (() => {
                     anim.stop();
                     window.location.assign(next_html);
