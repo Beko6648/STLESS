@@ -124,6 +124,9 @@ app.once('ready', () => {
     express_app.get("/api/leave_time_array", function (req, res, next) {
         res.json(leave_time_array);
     });
+    express_app.get("/api/next_html_and_leave_time_array", function (req, res, next) {
+        res.json([next_html, leave_time_array]);
+    });
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
@@ -137,6 +140,12 @@ app.once('ready', () => {
         // console.log('data', data);
         people_in_store_queue_control(data.time_data, data.enter_or_leave);
         regulatory_process(data.people_count);
+
+        // 店内客数の変化を規制情報確認画面用に通知する
+        store_window.webContents.send('update_regulation_info', {
+            number_of_people: people_in_store_queue.length,
+            regulatory_status: next_html
+        });
     });
 
 

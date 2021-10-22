@@ -1,13 +1,12 @@
-window.jQuery = window.$ = require('jquery');
 const { ipcRenderer } = require('electron');
 const Store = require('electron-store');
 const store = new Store();
 
-$(() => {
+window.addEventListener('DOMContentLoaded', () => {
     // ページ読み込み時、過去の設定を読み取って初期値を表示する
     if (store.has('display_setting')) {
         const display_setting = store.get('display_setting');
-        $('.display_setting_card').each((index, card_element) => {
+        document.querySelectorAll('.display_setting_card').forEach((card_element) => {
             const card_id = card_element.id;
             let input_elements = card_element.querySelectorAll('input');
 
@@ -19,17 +18,17 @@ $(() => {
     if (store.has('system_setting')) {
         const system_setting = store.get('system_setting');
 
-        $('#max_people_in_store_input').val(system_setting.max_people_in_store);
-        $('#system_start_time_input').val(system_setting.system_start_time);
-        $('#system_end_time_input').val(system_setting.system_end_time);
+        document.querySelector('#max_people_in_store_input').value = system_setting.max_people_in_store;
+        document.querySelector('#system_start_time_input').value = system_setting.system_start_time;
+        document.querySelector('#system_end_time_input').value = system_setting.system_end_time;
 
     }
 
     // 設定完了ボタン押下時、設定を保存してページ遷移
-    $(document).on('click', '#end_system_setting_button', () => {
+    document.querySelector('#end_system_setting_button').addEventListener('click', () => {
         let display_setting_obj = {};
 
-        $('.display_setting_card').each((index, card_element) => {
+        document.querySelectorAll('.display_setting_card').forEach((card_element) => {
             const card_id = card_element.id;
             let card_setting_obj = {};
             let input_elements = card_element.querySelectorAll('input');
@@ -43,9 +42,9 @@ $(() => {
         store.set('display_setting', display_setting_obj);
 
         const system_setting = {
-            max_people_in_store: $('#max_people_in_store_input').val(),
-            system_start_time: $('#system_start_time_input').val(),
-            system_end_time: $('#system_end_time_input').val()
+            max_people_in_store: document.querySelector('#max_people_in_store_input').value,
+            system_start_time: document.querySelector('#system_start_time_input').value,
+            system_end_time: document.querySelector('#system_end_time_input').value
         }
         store.set('system_setting', system_setting);
 

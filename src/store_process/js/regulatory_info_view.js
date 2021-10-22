@@ -1,15 +1,14 @@
-window.jQuery = window.$ = require('jquery');
 const { ipcRenderer } = require('electron');
 
-$(() => {
-    $(document).on('click', '#system_setting_button', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#system_setting_button').addEventListener('click', () => {
         (async () => {
             const data = await ipcRenderer.invoke('goto_system_setting', 'goto_system_setting:fromRegulatory_info_view');
             console.log('goto_system_setting', data);
         })()
     })
 
-    $(document).on('click', '#camera_setting_button', () => {
+    document.querySelector('#camera_setting_button').addEventListener('click', () => {
         (async () => {
             const data = await ipcRenderer.invoke('goto_camera_setting', 'goto_camera_setting:fromRegulatory_info_view');
             console.log('goto_camera_setting', data);
@@ -26,19 +25,19 @@ $(() => {
 
         switch (regulatory_status) {
             case 'allow_entry.html':
-                $('#regulatory_status').html('入店許可');
+                document.querySelector('#regulatory_status').innerHTML = '入店許可';
                 break;
             case 'regulation_nearing.html':
-                $('#regulatory_status').html('規制間近');
+                document.querySelector('#regulatory_status').innerHTML = '規制間近';
                 break;
             case 'regulation_and_time.html':
-                $('#regulatory_status').html('入店規制');
+                document.querySelector('#regulatory_status').innerHTML = '入店規制';
                 break;
 
             default:
                 break;
         }
 
-        $('#number_of_people').html(number_of_people);
+        document.querySelector('#number_of_people').innerHTML = number_of_people;
     })
 })
