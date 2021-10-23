@@ -1,4 +1,4 @@
-$(() => {
+window.addEventListener('DOMContentLoaded', () => {
     const displaying_URL = 'regulation_and_time.html'
     let next_html = '';
     let display_setting = null;
@@ -12,9 +12,9 @@ $(() => {
     xhr.addEventListener("load", function (e) {
         display_setting = JSON.parse(xhr.responseText);
         console.log(display_setting);
-        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
-        $('.regulatory_icon').html(display_setting.regulation_card.icon_input);
-        $('.regulatory_message').html(`${display_setting.regulation_card.title_input}<br>${display_setting.regulation_card.subtitle_input}`);
+        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+        document.querySelector('.regulatory_icon').innerHTML = display_setting.regulation_card.icon_input;
+        document.querySelector('.regulatory_message').innerHTML = `${display_setting.regulation_card.title_input}<br>${display_setting.regulation_card.subtitle_input}`;
 
         // アニメーションで使用するコンテナとパラメータを宣言する
         animContainer = document.getElementById('lottie');
@@ -47,26 +47,25 @@ $(() => {
             if (displaying_URL != next_html) {
                 switch (next_html) {
                     case 'allow_entry.html':
-                        $('html').css('background-color', `${display_setting.allow_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
                         break;
                     case 'regulation_nearing.html':
-                        $('html').css('background-color', `${display_setting.near_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
                         break;
                     case 'regulation_and_time.html':
-                        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
                         break;
                     case 'regulation_without_time.html':
-                        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
                         break;
 
                     default:
                         break;
                 }
-
                 anim.setDirection(-1);
                 anim.play();
-                $('.regulatory_info').removeClass('open');
-                $('.regulatory_info').addClass('close');
+                document.querySelector('.regulatory_info').classList.remove('open');
+                document.querySelector('.regulatory_info').classList.add('close');
                 anim.onLoopComplete = (() => {
                     anim.stop();
                     window.location.assign(next_html);
@@ -74,7 +73,7 @@ $(() => {
             }
 
             console.log(leave_time_array);
-            $('.waiting_time_display').html('');
+            document.querySelector('.waiting_time_display').innerHTML = '';
             leave_time_array.forEach((value, index) => {
                 let leave_date = moment(value);
                 let now_date = moment();
@@ -85,14 +84,14 @@ $(() => {
                 // 差分の分数を計算
                 let waiting_time = Math.round(leave_date.diff(now_date, 'minutes'));
                 if (waiting_time <= 1) {
-                    $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`)
+                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`;
                 } else {
-                    $('.waiting_time_display').append(`<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`)
+                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
                 }
             })
 
-            if (!$('.regulatory_info').hasClass('open')) {
-                $('.regulatory_info').addClass('open');
+            if (!document.querySelector('.regulatory_info').classList.contains('open')) {
+                document.querySelector('.regulatory_info').classList.add('open');
             }
         });
         xhr.send();

@@ -1,4 +1,4 @@
-$(() => {
+window.addEventListener('DOMContentLoaded', () => {
     const displaying_URL = 'regulation_nearing.html'
     let next_html = '';
     let display_setting = null;
@@ -12,9 +12,9 @@ $(() => {
     xhr.addEventListener("load", function (e) {
         display_setting = JSON.parse(xhr.responseText);
         console.log(display_setting);
-        $('html').css('background-color', `${display_setting.near_card.color_input}`);
-        $('.regulatory_icon').html(display_setting.near_card.icon_input);
-        $('.regulatory_message').html(`${display_setting.near_card.title_input}<br>${display_setting.near_card.subtitle_input}`);
+        document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
+        document.querySelector('.regulatory_icon').innerHTML = display_setting.near_card.icon_input;
+        document.querySelector('.regulatory_message').innerHTML = `${display_setting.near_card.title_input}<br>${display_setting.near_card.subtitle_input}`;
 
         // アニメーションで使用するコンテナとパラメータを宣言する
         animContainer = document.getElementById('lottie');
@@ -33,7 +33,7 @@ $(() => {
 
         // bodyMovinアニメーションの読み込み
         anim = lottie.loadAnimation(params);
-        $('.regulatory_info').addClass('open');
+        document.querySelector('.regulatory_info').classList.add('open');
     });
     xhr.send();
 
@@ -47,16 +47,16 @@ $(() => {
             if (displaying_URL != next_html) {
                 switch (next_html) {
                     case 'allow_entry.html':
-                        $('html').css('background-color', `${display_setting.allow_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
                         break;
                     case 'regulation_nearing.html':
-                        $('html').css('background-color', `${display_setting.near_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
                         break;
                     case 'regulation_and_time.html':
-                        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
                         break;
                     case 'regulation_without_time.html':
-                        $('html').css('background-color', `${display_setting.regulation_card.color_input}`);
+                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
                         break;
 
                     default:
@@ -64,8 +64,8 @@ $(() => {
                 }
                 anim.setDirection(-1);
                 anim.play();
-                $('.regulatory_info').removeClass('open');
-                $('.regulatory_info').addClass('close');
+                document.querySelector('.regulatory_info').classList.remove('open');
+                document.querySelector('.regulatory_info').classList.add('close');
                 anim.onLoopComplete = (() => {
                     anim.stop();
                     window.location.assign(next_html);
