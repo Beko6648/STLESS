@@ -25,6 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const system_setting = store.get('system_setting');
 
         document.querySelector('#max_people_in_store_input').value = system_setting.max_people_in_store;
+        document.querySelector('#max_people_in_store_display').innerHTML = system_setting.max_people_in_store;
         document.querySelector('#system_start_time_input').value = system_setting.system_start_time;
         document.querySelector('#system_end_time_input').value = system_setting.system_end_time;
 
@@ -82,39 +83,59 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     // input number
-    const decrement = (e) => {
-        const btn = e.target.parentNode.parentElement.querySelector(
-            'button[data-action="decrement"]'
-        );
-        const target = btn.nextElementSibling;
+    document.querySelector('#decrement').addEventListener("click", (e) => {
+        // const btn = e.target.parentNode.parentElement.querySelector('#decrement');
+        const target = document.querySelector('#max_people_in_store_input');
         let value = Number(target.value);
         value--;
         target.value = value;
-    }
+        document.querySelector('#max_people_in_store_display').innerHTML = value;
+    });
 
-    const increment = (e) => {
-        const btn = e.target.parentNode.parentElement.querySelector(
-            'button[data-action="decrement"]'
-        );
-        const target = btn.nextElementSibling;
+    document.querySelector('#increment').addEventListener("click", (e) => {
+        // const btn = e.target.parentNode.parentElement.querySelector('#increment');
+        const target = document.querySelector('#max_people_in_store_input');
         let value = Number(target.value);
         value++;
         target.value = value;
-    }
-
-    const decrementButtons = document.querySelectorAll(
-        `button[data-action="decrement"]`
-    );
-
-    const incrementButtons = document.querySelectorAll(
-        `button[data-action="increment"]`
-    );
-
-    decrementButtons.forEach(btn => {
-        btn.addEventListener("click", decrement);
+        document.querySelector('#max_people_in_store_display').innerHTML = value;
     });
 
-    incrementButtons.forEach(btn => {
-        btn.addEventListener("click", increment);
-    });
+
+    // input number
+    // const decrement = (e) => {
+    //     const btn = e.target.parentNode.parentElement.querySelector(
+    //         'button[data-action="decrement"]'
+    //     );
+    //     const target = btn.nextElementSibling;
+    //     let value = Number(target.value);
+    //     value--;
+    //     target.value = value;
+    // }
+
+    // const increment = (e) => {
+    //     const btn = e.target.parentNode.parentElement.querySelector(
+    //         'button[data-action="decrement"]'
+    //     );
+    //     const target = btn.nextElementSibling;
+    //     let value = Number(target.value);
+    //     value++;
+    //     target.value = value;
+    // }
+
+    // const decrementButtons = document.querySelectorAll(
+    //     `button[data-action="decrement"]`
+    // );
+
+    // const incrementButtons = document.querySelectorAll(
+    //     `button[data-action="increment"]`
+    // );
+
+    // decrementButtons.forEach(btn => {
+    //     btn.addEventListener("click", decrement);
+    // });
+
+    // incrementButtons.forEach(btn => {
+    //     btn.addEventListener("click", increment);
+    // });
 })
