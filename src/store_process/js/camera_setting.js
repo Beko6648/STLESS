@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (store.has('camera_setting')) {
         saved_number_of_entrance = store.get('camera_setting').number_of_entrance;
         document.querySelector('#number_of_entrance').value = saved_number_of_entrance;
-        document.querySelector('#number_of_entrance_display').innerHTML = `${saved_entrance_name_and_ip_array}`;
+        document.querySelector('#number_of_entrance_display').innerHTML = saved_number_of_entrance;
         saved_entrance_name_and_ip_array = store.get('camera_setting').entrance_name_and_ip_array;
     } else {
         document.querySelector('#number_of_entrance').value = 1;

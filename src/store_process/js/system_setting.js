@@ -100,42 +100,4 @@ window.addEventListener('DOMContentLoaded', () => {
         target.value = value;
         document.querySelector('#max_people_in_store_display').innerHTML = value;
     });
-
-
-    // input number
-    // const decrement = (e) => {
-    //     const btn = e.target.parentNode.parentElement.querySelector(
-    //         'button[data-action="decrement"]'
-    //     );
-    //     const target = btn.nextElementSibling;
-    //     let value = Number(target.value);
-    //     value--;
-    //     target.value = value;
-    // }
-
-    // const increment = (e) => {
-    //     const btn = e.target.parentNode.parentElement.querySelector(
-    //         'button[data-action="decrement"]'
-    //     );
-    //     const target = btn.nextElementSibling;
-    //     let value = Number(target.value);
-    //     value++;
-    //     target.value = value;
-    // }
-
-    // const decrementButtons = document.querySelectorAll(
-    //     `button[data-action="decrement"]`
-    // );
-
-    // const incrementButtons = document.querySelectorAll(
-    //     `button[data-action="increment"]`
-    // );
-
-    // decrementButtons.forEach(btn => {
-    //     btn.addEventListener("click", decrement);
-    // });
-
-    // incrementButtons.forEach(btn => {
-    //     btn.addEventListener("click", increment);
-    // });
 })
