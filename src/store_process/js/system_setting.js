@@ -6,6 +6,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // ページ読み込み時、過去の設定を読み取って初期値を表示する
     if (store.has('display_setting')) {
         const display_setting = store.get('display_setting');
+
+        // 設定カードの色付け
+        document.querySelector('#allow_card').style.backgroundColor = display_setting.allow_card.color_input
+        document.querySelector('#near_card').style.backgroundColor = display_setting.near_card.color_input
+        document.querySelector('#regulation_card').style.backgroundColor = display_setting.regulation_card.color_input
+
         document.querySelectorAll('.display_setting_card').forEach((card_element) => {
             const card_id = card_element.id;
             let input_elements = card_element.querySelectorAll('input');
@@ -55,4 +61,60 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('goto_regulatory_info_view ', data);
         })()
     })
+
+
+    // カラーピッカー
+    // $(document).on('change', 'input[type=color]', function () {
+    //     this.parentNode.style.backgroundColor = this.value;
+    // });
+
+    document.querySelector('input[type=color]').addEventListener('change', (e) => {
+        e.target.parentElement.style.backgroundColor = e.target.value;
+    })
+
+    const colorPickers = document.querySelectorAll(
+        `input[type=color]`
+    );
+
+    colorPickers.forEach(colorPicker => {
+        colorPicker.parentElement.style.backgroundColor = colorPicker.value;
+    });
+
+
+    // input number
+    const decrement = (e) => {
+        const btn = e.target.parentNode.parentElement.querySelector(
+            'button[data-action="decrement"]'
+        );
+        const target = btn.nextElementSibling;
+        let value = Number(target.value);
+        value--;
+        target.value = value;
+    }
+
+    const increment = (e) => {
+        const btn = e.target.parentNode.parentElement.querySelector(
+            'button[data-action="decrement"]'
+        );
+        const target = btn.nextElementSibling;
+        let value = Number(target.value);
+        value++;
+        target.value = value;
+    }
+
+    const decrementButtons = document.querySelectorAll(
+        `button[data-action="decrement"]`
+    );
+
+    const incrementButtons = document.querySelectorAll(
+        `button[data-action="increment"]`
+    );
+
+    decrementButtons.forEach(btn => {
+        btn.addEventListener("click", decrement);
+    });
+
+    incrementButtons.forEach(btn => {
+        btn.addEventListener("click", increment);
+    });
 })

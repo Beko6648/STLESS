@@ -40,4 +40,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelector('#number_of_people').innerHTML = number_of_people;
     })
+
 })

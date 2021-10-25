@@ -66,5 +66,46 @@ window.addEventListener('DOMContentLoaded', () => {
             const data = await ipcRenderer.invoke('goto_regulatory_info_view', 'goto_regulatory_info_view:fromCamera_setting');
             console.log('goto_regulatory_info_view', data);
         })()
-    })
+    });
+
+
+    const decrement = (e) => {
+        const btn = e.target.parentNode.parentElement.querySelector(
+            'button[data-action="decrement"]'
+        );
+        const target = btn.nextElementSibling;
+        let value = Number(target.value);
+        value--;
+        target.value = value;
+
+        draw_entrance_name_and_ip_settings();
+    }
+
+    const increment = (e) => {
+        const btn = e.target.parentNode.parentElement.querySelector(
+            'button[data-action="decrement"]'
+        );
+        const target = btn.nextElementSibling;
+        let value = Number(target.value);
+        value++;
+        target.value = value;
+
+        draw_entrance_name_and_ip_settings();
+    }
+
+    const decrementButtons = document.querySelectorAll(
+        `button[data-action="decrement"]`
+    );
+
+    const incrementButtons = document.querySelectorAll(
+        `button[data-action="increment"]`
+    );
+
+    decrementButtons.forEach(btn => {
+        btn.addEventListener("click", decrement);
+    });
+
+    incrementButtons.forEach(btn => {
+        btn.addEventListener("click", increment);
+    });
 })

@@ -15,7 +15,7 @@ app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 
 // オプションとして変更できる変数の初期化
-let regulation_nearing_ratio = 0.9; // 規制間近とする人数割合
+let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
 
 // 変数の初期化
 let store_window = null;
@@ -51,8 +51,8 @@ app.once('ready', () => {
     store_window = new BrowserWindow({
         show: false,
         backgroundColor: '#F8F9FA',
-        width: 800,
-        height: 500,
+        width: 1000,
+        height: 800,
         title: 'STLESS',
         webPreferences: {
             nodeIntegration: true,
