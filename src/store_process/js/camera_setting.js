@@ -15,9 +15,21 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#camera_ip_container').innerHTML = '';
         for (let i = 0; i < number_of_entrance; i++) {
             document.querySelector('#camera_ip_container').innerHTML += `
-            <div class='entrance_input_container'>
-                <input type="text" class="entrance_name_input" id="entrance_name_${i + 1}" value="${is_saved && i < saved_entrance_name_and_ip_array.length ? saved_entrance_name_and_ip_array[i].entrance_name : ''}" placeholder="カメラ${i + 1}の出入り口名">
-                <input type="text" class="camera_ip_input" id="camera_ip_${i + 1}" value="${is_saved && i < saved_entrance_name_and_ip_array.length ? saved_entrance_name_and_ip_array[i].camera_ip : ''}" placeholder="カメラ${i + 1}のIPアドレス">
+            <div class='entrance_input_container flex flex-row justify-center'>
+                <div class="m-1">
+                    <label class="text-gray-700 px-1">
+                        カメラ${i + 1}の出入り口名
+                    </label>
+                    <input type="text" class="entrance_name_input rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    id="entrance_name_${i + 1}" value="${is_saved && i < saved_entrance_name_and_ip_array.length ? saved_entrance_name_and_ip_array[i].entrance_name : ''}" placeholder="カメラ${i + 1}の出入り口名">
+                </div>
+                <div class="m-1">
+                    <label class="text-gray-700 px-1">
+                        カメラ${i + 1}のIPアドレス
+                    </label>
+                    <input type="text" class="camera_ip_input rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    id="camera_ip_${i + 1}" value="${is_saved && i < saved_entrance_name_and_ip_array.length ? saved_entrance_name_and_ip_array[i].camera_ip : ''}" placeholder="カメラ${i + 1}のIPアドレス">
+                </div>
             </div>
             `;
         }

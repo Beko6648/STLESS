@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="h-full">
 
 <head>
     <meta charset="UTF-8">
@@ -13,23 +13,78 @@
     <script src="../js/initial_setting.js"></script>
 </head>
 
-<body>
+<body class="h-full">
     <h1>initial_setting</h1>
-    <div id="system_setting_container">
-        <div id="system_start_and_end_time_setting">
-            システム開始時刻:
-            <input type="time" id="system_start_time_input">
-            システム終了時刻:
-            <input type="time" id="system_end_time_input">
+    <dev class="flex flex-col justify-center">
+
+
+        <div id="system_setting_container" class="flex flex-row justify-center m-2">
+            <div id="system_start_and_end_time_setting flex flex-col justify-center flex-grow h-full w-50">
+                <div class="flex-grow">
+                    <label>システム開始時刻:</label>
+                    <input type="time" id="system_start_time_input"
+                        class="appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent flex-1" />
+                </div>
+                <div class="flex-grow">
+                    <label>システム終了時刻:</label>
+                    <input type="time" id="system_end_time_input"
+                        class="appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent flex-1" />
+                </div>
+            </div>
+
+            <div id="max_people_in_store" class="flex flex-col justify-center m-2">
+                <label class="flex-grow-0 text-gray-700">
+                    店内上限人数:
+                </label>
+                <div class="flex flex-row border h-10 w-24 rounded-lg border-gray-400 relative">
+                    <button id="max_people_decrement"
+                        class="font-semibold border-r bg-red-700 hover:bg-red-600 text-white border-gray-400 h-full w-20 flex rounded-l focus:outline-none cursor-pointer">
+                        <span class="m-auto">-</span>
+                    </button>
+                    <input type="hidden" id="max_people_in_store_input"
+                        class="md:p-2 p-1 text-xs md:text-base border-gray-400 focus:outline-none text-center" readonly
+                        name="custom-input-number" />
+                    <div class="bg-white w-24 text-xs md:text-base flex items-center justify-center cursor-default">
+                        <span id="max_people_in_store_display"></span>
+                    </div>
+                    <button id="max_people_increment"
+                        class="font-semibold border-l  bg-blue-700 hover:bg-blue-600 text-white border-gray-400 h-full w-20 flex rounded-r focus:outline-none cursor-pointer">
+                        <span class="m-auto">+</span>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div id="max_people_in_store">
-            店内上限人数:
-            <input type="number" id=" ">
+
+        <div class="flex flex-col justify-center items-center h-full p-1">
+            <label class="flex-grow-0 text-gray-700">
+                出入り口数:
+            </label>
+            <div class="flex flex-row justify-center border h-10 w-24 rounded-lg border-gray-400">
+                <button id="entrance_decrement"
+                    class="font-semibold border-r bg-red-700 hover:bg-red-600 text-white border-gray-400 h-full w-20 flex rounded-l focus:outline-none cursor-pointer">
+                    <span class="m-auto">-</span>
+                </button>
+
+                <input type="hidden" id="number_of_entrance"
+                    class="md:p-2 p-1 text-xs md:text-base border-gray-400 focus:outline-none text-center" readonly
+                    name="custom-input-number" />
+                <div class="bg-white w-24 text-xs md:text-base flex items-center justify-center cursor-default">
+                    <span id="number_of_entrance_display"></span>
+                </div>
+
+                <button id="entrance_increment"
+                    class="font-semibold border-l  bg-blue-700 hover:bg-blue-600 text-white border-gray-400 h-full w-20 flex rounded-r focus:outline-none cursor-pointer">
+                    <span class="m-auto">+</span>
+                </button>
+            </div>
+
+            <div id="camera_ip_container"></div>
+            <button id="end_camera_setting_button"
+                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                設定を完了して規制情報表示画面へ
+            </button>
         </div>
-    </div>
-    <input type="number" name="number_of_entrance" id="number_of_entrance">
-    <div id="camera_ip_container"></div>
-    <button id="end_camera_setting_button">設定を完了して規制情報表示画面へ</button>
+    </dev>
 </body>
 
 </html>

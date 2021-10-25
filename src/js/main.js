@@ -36,7 +36,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    // store.clear();
+    store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({

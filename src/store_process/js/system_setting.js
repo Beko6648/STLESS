@@ -65,10 +65,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     // カラーピッカー
-    // $(document).on('change', 'input[type=color]', function () {
-    //     this.parentNode.style.backgroundColor = this.value;
-    // });
-
     document.querySelector('input[type=color]').addEventListener('change', (e) => {
         e.target.parentElement.style.backgroundColor = e.target.value;
     })
