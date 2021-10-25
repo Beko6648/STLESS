@@ -29,9 +29,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (store.has('camera_setting')) {
         saved_number_of_entrance = store.get('camera_setting').number_of_entrance;
         document.querySelector('#number_of_entrance').value = saved_number_of_entrance;
+        document.querySelector('#number_of_entrance_display').innerHTML = `${saved_entrance_name_and_ip_array}`;
         saved_entrance_name_and_ip_array = store.get('camera_setting').entrance_name_and_ip_array;
     } else {
         document.querySelector('#number_of_entrance').value = 1;
+        document.querySelector('#number_of_entrance_display').innerHTML = 1;
     }
 
     // 出入り口数、初期値の数だけ描画する
@@ -69,43 +71,25 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    const decrement = (e) => {
-        const btn = e.target.parentNode.parentElement.querySelector(
-            'button[data-action="decrement"]'
-        );
-        const target = btn.nextElementSibling;
+    // input number
+    document.querySelector('#decrement').addEventListener("click", (e) => {
+        // const btn = e.target.parentNode.parentElement.querySelector('#decrement');
+        const target = document.querySelector('#number_of_entrance');
         let value = Number(target.value);
         value--;
         target.value = value;
-
+        document.querySelector('#number_of_entrance_display').innerHTML = value;
         draw_entrance_name_and_ip_settings();
-    }
+    });
 
-    const increment = (e) => {
-        const btn = e.target.parentNode.parentElement.querySelector(
-            'button[data-action="decrement"]'
-        );
-        const target = btn.nextElementSibling;
+    document.querySelector('#increment').addEventListener("click", (e) => {
+        // const btn = e.target.parentNode.parentElement.querySelector('#increment');
+        const target = document.querySelector('#number_of_entrance');
         let value = Number(target.value);
         value++;
         target.value = value;
-
+        document.querySelector('#number_of_entrance_display').innerHTML = value;
         draw_entrance_name_and_ip_settings();
-    }
-
-    const decrementButtons = document.querySelectorAll(
-        `button[data-action="decrement"]`
-    );
-
-    const incrementButtons = document.querySelectorAll(
-        `button[data-action="increment"]`
-    );
-
-    decrementButtons.forEach(btn => {
-        btn.addEventListener("click", decrement);
     });
 
-    incrementButtons.forEach(btn => {
-        btn.addEventListener("click", increment);
-    });
 })
