@@ -7,6 +7,7 @@ const moment = require("moment");
 const ULID = require('ulid')
 const express = require('express');
 const express_app = express();
+const router = express.Router();
 const port = 3000;
 const mysql = require('mysql');
 
@@ -127,6 +128,14 @@ app.once('ready', () => {
     express_app.get("/api/next_html_and_leave_time_array", function (req, res, next) {
         res.json([next_html, leave_time_array]);
     });
+
+    // pythonとの通信
+
+    express_app.get('/python', function (req, res) {
+        res.send("hello");
+        console.log(req);
+    })
+
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
