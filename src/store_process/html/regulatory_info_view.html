@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="h-full">
 
 <head>
     <meta charset="UTF-8">
@@ -13,20 +13,26 @@
     <script src="../js/regulatory_info_view.js"></script>
 </head>
 
-<body>
-    <h1>regulatory_info_view</h1>
-    <div id="regulatory_status_container">
-        規制状況:
-        <span id="regulatory_status"></span>
+<body class="h-full">
+    <div class="h-full flex flex-col justify-between items-center p-1">
+        <div class="border-2 border-black font-bold text-2xl rounded-lg p-1 inline-block">規制状況確認</div>
+        <div class="flex flex-col justify-center items-center">
+            <div id="regulatory_status_container" class="font-bold text-2xl m-1">
+                規制状況:
+                <span id="regulatory_status" class="font-bold text-2xl"></span>
+            </div>
+            <div id="number_of_people_container" class="font-bold text-2xl m-1">
+                店内人数:
+                <span id="number_of_people" class="font-bold text-2xl"></span>
+            </div>
+        </div>
+        <div class="flex flex-row justify-between items-center">
+            <button id="system_setting_button"
+                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">システム設定画面へ</button>
+            <button id="camera_setting_button"
+                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ設定画面へ</button>
+        </div>
     </div>
-    <div id="number_of_people_container">
-        店内人数:
-        <span id="number_of_people"></span>
-    </div>
-    <button id="system_setting_button"
-        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">システム設定画面へ</button>
-    <button id="camera_setting_button"
-        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ設定画面へ</button>
 </body>
 
 </html>
