@@ -22,7 +22,7 @@ let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
 let store_window = null;
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
-let waiting_time_estimation_data = { hour: 0, minute: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
+let waiting_time_estimation_data = { hour: 0, minute: 0, second: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
 let max_people_in_store = null; // 店舗最大許容人数
@@ -192,6 +192,7 @@ app.once('ready', () => {
                 // 待ち時間推測用データ（平均買い物時間）を加算する
                 entry_date.add(waiting_time_estimation_data.hour, 'hours');
                 entry_date.add(waiting_time_estimation_data.minute, 'minutes');
+                entry_date.add(waiting_time_estimation_data.second, 'seconds');　// 中間発表のため秒を追加する
 
                 return entry_date.toISOString();
             })

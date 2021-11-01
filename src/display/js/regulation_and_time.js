@@ -82,11 +82,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 console.log('現在時間', now_date.format('HH:mm:ss'));
 
                 // 差分の分数を計算
-                let waiting_time = Math.round(leave_date.diff(now_date, 'minutes'));
+                // let waiting_time = Math.round(leave_date.diff(now_date, 'minutes')); 中間発表のため秒単位に変更
+                let waiting_time = Math.round(leave_date.diff(now_date, 'seconds'));
                 if (waiting_time <= 1) {
                     document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`;
                 } else {
-                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
+                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}秒</div>`;
                 }
             })
 

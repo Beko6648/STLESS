@@ -84,6 +84,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // メインプロセスへ規制情報表示画面へのページ遷移を依頼する
         (async () => {
+            await ipcRenderer.invoke('update_setting', 'update_setting :fromSystem_setting');
             const data = await ipcRenderer.invoke('goto_regulatory_info_view', 'goto_regulatory_info_view:fromCamera_setting');
             console.log('goto_regulatory_info_view', data);
         })()
