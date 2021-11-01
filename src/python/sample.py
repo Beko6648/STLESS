@@ -39,3 +39,5 @@ while True:
     # elif(total>0):
     #     print(json.dumps(get_dict_data('leave')))
     # time.sleep(2)
+    
+# ガチっぽいサンプルを作る
