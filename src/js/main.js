@@ -181,6 +181,7 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
+        // 先頭のお客様・・・フラグをfalseで初期化
         console.log('max_people_in_store', max_people_in_store);
         if (max_people_in_store <= people_count) { // 規制する場合
             let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
@@ -192,16 +193,22 @@ app.once('ready', () => {
                 // 待ち時間推測用データ（平均買い物時間）を加算する
                 entry_date.add(waiting_time_estimation_data.hour, 'hours');
                 entry_date.add(waiting_time_estimation_data.minute, 'minutes');
-                entry_date.add(waiting_time_estimation_data.second, 'seconds');　// 中間発表のため秒を追加する
+                entry_date.add(waiting_time_estimation_data.second, 'seconds'); // 中間発表のため秒を追加する
 
                 return entry_date.toISOString();
             })
             next_html = 'regulation_and_time.html';
             console.log('規制');
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
+            if (next_html === 'regulation_and_time.html') {
+                // 先頭のお客様・・・フラグ立てる
+            }
             next_html = 'regulation_nearing.html';
             console.log('規制間近');
         } else {
+            if (next_html === 'regulation_and_time.html') {
+                // 先頭のお客様・・・フラグ立てる
+            }
             next_html = 'allow_entry.html';
             console.log('許可');
         }
