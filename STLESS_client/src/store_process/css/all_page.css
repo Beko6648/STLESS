@@ -1,0 +1,37 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@font-face {
+	font-family: "DotGothic";
+	src: url(../fonts/DotGothic16-Regular.ttf);
+}
+
+html {
+	font-family: DotGothic;
+}
+
+body {
+	height: 100%;
+}
+
+.regulatory_info {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.regulatory_icon {
+	height: 100%;
+	font-size: 2500%;
+}
+
+.regulatory_message {
+	height: 100%;
+	font-size: 400%;
+	text-align: center;
+}

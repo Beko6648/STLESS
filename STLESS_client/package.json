@@ -1,0 +1,61 @@
+{
+	"name": "stless_client",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./src/js/main.js",
+	"scripts": {
+		"start": "electron .",
+		"build": "npx electron-builder --win --x64",
+		"dev": "tailwindcss build ./src/store_process/css/tailwind.css -o ./src/store_process/css/tailwind_dev.css"
+	},
+	"build": {
+		"appId": "com.example.STLESS",
+		"productName": "STLESS",
+		"asar": true,
+		"files": [
+			"**/*"
+		],
+		"extraFiles": [
+			{
+				"from": "icon",
+				"to": "resources",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"win": {
+			"target": "nsis",
+			"icon": "./icon/atom-256px.png"
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Beko6648/STLESS.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Beko6648/STLESS/issues"
+	},
+	"homepage": "https://github.com/Beko6648/STLESS#readme",
+	"devDependencies": {
+		"electron": "^15.0.0",
+		"electron-builder": "^22.11.7"
+	},
+	"dependencies": {
+		"electron-store": "^8.0.1",
+		"express": "^4.17.1",
+		"lottie-web": "^5.7.14",
+		"moment": "^2.29.1",
+		"mysql": "^2.18.1",
+		"path": "^0.12.7",
+		"python-shell": "^3.0.0",
+		"tailwindcss": "^2.2.17",
+		"ulid": "^2.3.0"
+	}
+}
