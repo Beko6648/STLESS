@@ -1,4 +1,92 @@
 window.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
+    socket.on('next_html', (next_html) => {
+        console.log(next_html);
+        if (displaying_URL != next_html) {
+            switch (next_html) {
+                case 'allow_entry.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
+                    break;
+                case 'regulation_nearing.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
+                    break;
+                case 'regulation_and_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+                case 'regulation_without_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+
+                default:
+                    break;
+            }
+            anim.setDirection(-1);
+            anim.play();
+            document.querySelector('.regulatory_info').classList.remove('open');
+            document.querySelector('.regulatory_info').classList.add('close');
+            anim.onLoopComplete = (() => {
+                anim.stop();
+                window.location.assign(next_html);
+            })
+        }
+    })
+
+
+    // socket.on('next_html_and_leave_time_array', (next_html, leave_time_array) => {
+    //     console.log(next_html);
+    //     if (displaying_URL != next_html) {
+    //         switch (next_html) {
+    //             case 'allow_entry.html':
+    //                 document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
+    //                 break;
+    //             case 'regulation_nearing.html':
+    //                 document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
+    //                 break;
+    //             case 'regulation_and_time.html':
+    //                 document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+    //                 break;
+    //             case 'regulation_without_time.html':
+    //                 document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+    //                 break;
+
+    //             default:
+    //                 break;
+    //         }
+    //         anim.setDirection(-1);
+    //         anim.play();
+    //         document.querySelector('.regulatory_info').classList.remove('open');
+    //         document.querySelector('.regulatory_info').classList.add('close');
+    //         anim.onLoopComplete = (() => {
+    //             anim.stop();
+    //             window.location.assign(next_html);
+    //         })
+    //     }
+
+    //     console.log(leave_time_array);
+    //     document.querySelector('.waiting_time_display').innerHTML = '<span>待ち時間</span>';
+    //     leave_time_array.forEach((value, index) => {
+    //         let leave_date = moment(value);
+    //         let now_date = moment();
+
+    //         console.log('予想退店時間', leave_date.format('HH:mm:ss'));
+    //         console.log('現在時間', now_date.format('HH:mm:ss'));
+
+    //         // 差分の分数を計算
+    //         // let waiting_time = Math.round(leave_date.diff(now_date, 'minutes')); 中間発表のため秒単位に変更
+    //         let waiting_time = Math.round(leave_date.diff(now_date, 'seconds'));
+    //         if (waiting_time <= 1) {
+    //             document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`;
+    //         } else {
+    //             document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
+    //         }
+    //     })
+
+    //     if (!document.querySelector('.regulatory_info').classList.contains('open')) {
+    //         document.querySelector('.regulatory_info').classList.add('open');
+    //     }
+    // })
+
+
     const displaying_URL = 'regulation_and_time.html'
     let next_html = '';
     let display_setting = null;
@@ -39,38 +127,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const api_access = () => {
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/api/next_html_and_leave_time_array");
+        xhr.open("GET", "/api/leave_time_array");
         xhr.addEventListener("load", function (e) {
             let leave_time_array = [];
-            [next_html, leave_time_array] = JSON.parse(xhr.responseText);
-            console.log(next_html);
-            if (displaying_URL != next_html) {
-                switch (next_html) {
-                    case 'allow_entry.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
-                        break;
-                    case 'regulation_nearing.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
-                        break;
-                    case 'regulation_and_time.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                        break;
-                    case 'regulation_without_time.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                        break;
-
-                    default:
-                        break;
-                }
-                anim.setDirection(-1);
-                anim.play();
-                document.querySelector('.regulatory_info').classList.remove('open');
-                document.querySelector('.regulatory_info').classList.add('close');
-                anim.onLoopComplete = (() => {
-                    anim.stop();
-                    window.location.assign(next_html);
-                })
-            }
+            leave_time_array = JSON.parse(xhr.responseText);
 
             console.log(leave_time_array);
             document.querySelector('.waiting_time_display').innerHTML = '<span>待ち時間</span>';

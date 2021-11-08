@@ -7,8 +7,10 @@ const moment = require("moment");
 const ULID = require('ulid')
 const express = require('express');
 const express_app = express();
-const router = express.Router();
 const port = 3000;
+const httpServer = require("http").createServer(express_app);
+const options = { /* ... */ };
+const io = require("socket.io")(httpServer, options);
 const mysql = require('mysql');
 
 // Chromiumによるバックグラウンド処理の遅延対策
@@ -25,6 +27,7 @@ let shopping_time_queue = []; // 入退店データキュー入店時間,退店�
 let waiting_time_estimation_data = { hour: 0, minute: 0, second: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
+let is_allow_first_customer = false; // 先頭のお客様を許可するかどうか
 let max_people_in_store = null; // 店舗最大許容人数
 if (store.has('system_setting')) {
     max_people_in_store = store.get('system_setting').max_people_in_store;
@@ -92,7 +95,7 @@ app.once('ready', () => {
         store.set('display_setting', display_setting);
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
-            console.log(results);
+            // console.log(results);
         });
         // 初期設定としてカメラ設定画面を表示する
         store_window.loadFile(path.join(__dirname, '../store_process/html/initial_setting.html'));
@@ -107,26 +110,32 @@ app.once('ready', () => {
         store_window.show();
     });
 
+    // socket.ioのテスト用
+    express_app.get('/', function (req, res) {
+        res.sendFile(__dirname + '/index.html');
+    });
+
+    io.on('connection', function (socket) {
+        console.log('connected');
+    });
+
+    httpServer.listen(port, function () {
+        console.log('server listening. port:' + port);
+    });
 
 
     // 規制情報表示ディスプレイのためにhttpサーバを立てる
     express_app.use(express.static(path.join(__dirname, '../display')));
-    express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+    // express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+
 
     // 規制情報表示にディスプレイ設定を引き渡す
     express_app.get("/api/display_setting", function (req, res, next) {
         res.json(store.get('display_setting'));
     });
-    // 規制情報表示htmlからのリクエストに対し、次に表示するhtml情報を返す
-    express_app.get("/api/next_html", function (req, res, next) {
-        res.json(next_html);
-    });
     // 規制情報表示htmlからのリクエストに対し、待ち時間を格納した配列を返す
     express_app.get("/api/leave_time_array", function (req, res, next) {
         res.json(leave_time_array);
-    });
-    express_app.get("/api/next_html_and_leave_time_array", function (req, res, next) {
-        res.json([next_html, leave_time_array]);
     });
 
     // pythonとの通信
@@ -182,6 +191,8 @@ app.once('ready', () => {
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
         // 先頭のお客様・・・フラグをfalseで初期化
+        allow_first_customer = false;
+
         console.log('max_people_in_store', max_people_in_store);
         if (max_people_in_store <= people_count) { // 規制する場合
             let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
@@ -199,18 +210,24 @@ app.once('ready', () => {
             })
             next_html = 'regulation_and_time.html';
             console.log('規制');
+            io.emit('next_html', next_html);
+            // io.emit('next_html_and_leave_time_array', next_html, leave_time_array);
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・フラグ立てる
+                allow_first_customer = true;
             }
             next_html = 'regulation_nearing.html';
             console.log('規制間近');
+            io.emit('next_html', next_html);
         } else {
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・フラグ立てる
+                allow_first_customer = true;
             }
             next_html = 'allow_entry.html';
             console.log('許可');
+            io.emit('next_html', next_html);
         }
     }
 });

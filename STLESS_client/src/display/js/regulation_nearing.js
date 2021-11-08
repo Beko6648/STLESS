@@ -1,4 +1,37 @@
 window.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
+    socket.on('next_html', (next_html) => {
+        console.log(next_html);
+        if (displaying_URL != next_html) {
+            switch (next_html) {
+                case 'allow_entry.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
+                    break;
+                case 'regulation_nearing.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
+                    break;
+                case 'regulation_and_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+                case 'regulation_without_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+
+                default:
+                    break;
+            }
+            anim.setDirection(-1);
+            anim.play();
+            document.querySelector('.regulatory_info').classList.remove('open');
+            document.querySelector('.regulatory_info').classList.add('close');
+            anim.onLoopComplete = (() => {
+                anim.stop();
+                window.location.assign(next_html);
+            })
+        }
+    })
+
+
     const displaying_URL = 'regulation_nearing.html'
     let next_html = '';
     let display_setting = null;
@@ -36,44 +69,4 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.regulatory_info').classList.add('open');
     });
     xhr.send();
-
-
-    const api_access = () => {
-        let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/api/next_html");
-        xhr.addEventListener("load", function (e) {
-            next_html = JSON.parse(xhr.responseText);
-            console.log(next_html);
-            if (displaying_URL != next_html) {
-                switch (next_html) {
-                    case 'allow_entry.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
-                        break;
-                    case 'regulation_nearing.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
-                        break;
-                    case 'regulation_and_time.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                        break;
-                    case 'regulation_without_time.html':
-                        document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                        break;
-
-                    default:
-                        break;
-                }
-                anim.setDirection(-1);
-                anim.play();
-                document.querySelector('.regulatory_info').classList.remove('open');
-                document.querySelector('.regulatory_info').classList.add('close');
-                anim.onLoopComplete = (() => {
-                    anim.stop();
-                    window.location.assign(next_html);
-                })
-            }
-        });
-        xhr.send();
-    }
-
-    setInterval(api_access, 1000);
 })

@@ -33,11 +33,3 @@ while True:
     for i in range(10):
         print(json.dumps(get_dict_data('leave')))
         time.sleep(2)
-    
-    # if(random.randint(0,1) == 0):
-    #     print(json.dumps(get_dict_data('enter')))
-    # elif(total>0):
-    #     print(json.dumps(get_dict_data('leave')))
-    # time.sleep(2)
-    
-# ガチっぽいサンプルを作る
