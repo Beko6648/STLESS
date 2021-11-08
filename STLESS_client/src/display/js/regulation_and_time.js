@@ -73,7 +73,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             console.log(leave_time_array);
-            document.querySelector('.waiting_time_display').innerHTML = '';
+            document.querySelector('.waiting_time_display').innerHTML = '<span>待ち時間</span>';
             leave_time_array.forEach((value, index) => {
                 let leave_date = moment(value);
                 let now_date = moment();
@@ -87,7 +87,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (waiting_time <= 1) {
                     document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`;
                 } else {
-                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}秒</div>`;
+                    document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
                 }
             })
 
