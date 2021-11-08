@@ -1,4 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
+    // スリープを実現するための関数
+    const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const socket = io();
     socket.on('next_html', (next_html) => {
         console.log(next_html);
@@ -29,62 +32,19 @@ window.addEventListener('DOMContentLoaded', () => {
                 window.location.assign(next_html);
             })
         }
+    });
+
+    // 先頭の客を許可する
+    socket.on('allow_first_customer', () => {
+        const first_waiting_time = document.querySelector('.waiting_time:nth-child(2)');
+        first_waiting_time.innerHTML = `1組目:どうぞご入店ください`;
+        console.log(first_waiting_time);
+        stop_timer();
+        (async () => {
+            await _sleep(5000);
+            start_timer();
+        })();
     })
-
-
-    // socket.on('next_html_and_leave_time_array', (next_html, leave_time_array) => {
-    //     console.log(next_html);
-    //     if (displaying_URL != next_html) {
-    //         switch (next_html) {
-    //             case 'allow_entry.html':
-    //                 document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
-    //                 break;
-    //             case 'regulation_nearing.html':
-    //                 document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
-    //                 break;
-    //             case 'regulation_and_time.html':
-    //                 document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-    //                 break;
-    //             case 'regulation_without_time.html':
-    //                 document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //         anim.setDirection(-1);
-    //         anim.play();
-    //         document.querySelector('.regulatory_info').classList.remove('open');
-    //         document.querySelector('.regulatory_info').classList.add('close');
-    //         anim.onLoopComplete = (() => {
-    //             anim.stop();
-    //             window.location.assign(next_html);
-    //         })
-    //     }
-
-    //     console.log(leave_time_array);
-    //     document.querySelector('.waiting_time_display').innerHTML = '<span>待ち時間</span>';
-    //     leave_time_array.forEach((value, index) => {
-    //         let leave_date = moment(value);
-    //         let now_date = moment();
-
-    //         console.log('予想退店時間', leave_date.format('HH:mm:ss'));
-    //         console.log('現在時間', now_date.format('HH:mm:ss'));
-
-    //         // 差分の分数を計算
-    //         // let waiting_time = Math.round(leave_date.diff(now_date, 'minutes')); 中間発表のため秒単位に変更
-    //         let waiting_time = Math.round(leave_date.diff(now_date, 'seconds'));
-    //         if (waiting_time <= 1) {
-    //             document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: まもなく入店いただけます。</div>`;
-    //         } else {
-    //             document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
-    //         }
-    //     })
-
-    //     if (!document.querySelector('.regulatory_info').classList.contains('open')) {
-    //         document.querySelector('.regulatory_info').classList.add('open');
-    //     }
-    // })
 
 
     const displaying_URL = 'regulation_and_time.html'
@@ -158,5 +118,17 @@ window.addEventListener('DOMContentLoaded', () => {
         xhr.send();
     }
 
-    setInterval(api_access, 1000);
+    let timer_id;
+
+    const start_timer = () => {
+        timer_id = setInterval(() => {
+            api_access();
+        }, 1000);
+    }
+
+    const stop_timer = () => {
+        clearInterval(timer_id);
+    }
+
+    start_timer();
 })
