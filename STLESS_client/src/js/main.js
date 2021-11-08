@@ -190,6 +190,8 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
+        let old_next_html = next_html;
+
         // 先頭のお客様・・・フラグをfalseで初期化
         allow_first_customer = false;
 
@@ -210,8 +212,6 @@ app.once('ready', () => {
             })
             next_html = 'regulation_and_time.html';
             console.log('規制');
-            io.emit('next_html', next_html);
-            // io.emit('next_html_and_leave_time_array', next_html, leave_time_array);
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・フラグ立てる
@@ -219,7 +219,6 @@ app.once('ready', () => {
             }
             next_html = 'regulation_nearing.html';
             console.log('規制間近');
-            io.emit('next_html', next_html);
         } else {
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・フラグ立てる
@@ -227,6 +226,10 @@ app.once('ready', () => {
             }
             next_html = 'allow_entry.html';
             console.log('許可');
+        }
+
+        // 規制状態が変化したら、規制情報確認画面に通知する
+        if (old_next_html !== next_html) {
             io.emit('next_html', next_html);
         }
     }
