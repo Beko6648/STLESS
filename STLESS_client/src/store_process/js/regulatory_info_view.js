@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })()
     })
 
-    document.querySelector('#camera_setting_button').addEventListener('click', () => {
-        (async () => {
-            const data = await ipcRenderer.invoke('goto_camera_setting', 'goto_camera_setting:fromRegulatory_info_view');
-            console.log('goto_camera_setting', data);
-        })()
-    })
+    // カメラ設定画面を廃止したのでコメントアウト
+    // document.querySelector('#camera_setting_button').addEventListener('click', () => {
+    //     (async () => {
+    //         const data = await ipcRenderer.invoke('goto_camera_setting', 'goto_camera_setting:fromRegulatory_info_view');
+    //         console.log('goto_camera_setting', data);
+    //     })()
+    // })
 
     // 店内客数が変化したタイミングで規制情報が送られてくる
     ipcRenderer.on("update_regulation_info", (event, regulatory_info_obj) => {

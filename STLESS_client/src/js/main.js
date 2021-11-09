@@ -40,7 +40,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    // store.clear();
+    store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -97,11 +97,13 @@ app.once('ready', () => {
             if (error) throw error;
             // console.log(results);
         });
-        // 初期設定としてカメラ設定画面を表示する
-        store_window.loadFile(path.join(__dirname, '../store_process/html/initial_setting.html'));
+        // 初期設定画面を表示する
+        // store_window.loadFile(path.join(__dirname, '../store_process/html/initial_setting.html'));
     } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
-        store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
+        // store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     }
+    // 規制情報表示画面を開く
+    store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     // 開発者ツールウィンドウを表示する
     store_window.webContents.openDevTools();
 
