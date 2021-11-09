@@ -40,7 +40,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    store.clear();
+    // store.clear();
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -111,13 +111,13 @@ app.once('ready', () => {
     });
 
     // socket.ioのテスト用
-    express_app.get('/', function (req, res) {
-        res.sendFile(__dirname + '/index.html');
+    io.on('connection', function (socket) {
+        console.log('connected------------------------------------------------------');
+        socket.on('python', function (msg) {
+            console.log(msg);
+        });
     });
 
-    io.on('connection', function (socket) {
-        console.log('connected');
-    });
 
     httpServer.listen(port, function () {
         console.log('server listening. port:' + port);

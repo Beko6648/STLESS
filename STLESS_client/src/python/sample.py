@@ -27,7 +27,7 @@ def get_dict_data(access):
 while True:
     for i in range(10):
         print(json.dumps(get_dict_data('enter')))
-        time.sleep(2)
+        time.sleep(1)
     time.sleep(5)
 
     for i in range(10):
