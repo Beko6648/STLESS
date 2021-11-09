@@ -168,7 +168,7 @@ app.once('ready', () => {
 
 
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
-    let people_in_store_queue_control = (time_data, enter_or_leave) => {
+    let people_in_store_queue_control = async (time_data, enter_or_leave) => {
         const arg_date = moment(time_data);
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
@@ -188,26 +188,32 @@ app.once('ready', () => {
         console.log('店内客数', people_in_store_queue.length);
     }
 
+    // 推定退店時間を計算する関数
+    let calculate_leave_time_array = () => {
+        let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
+
+        // 3人分の入店時間に待ち時間推測用データを加算し、規制表示の内容を決定する
+        leave_time_array = first_three_in_line.map((value) => {
+            let entry_date = moment(value); // 格納されていた入店時間データ
+
+            // 待ち時間推測用データ（平均買い物時間）を加算する
+            entry_date.add(waiting_time_estimation_data.hour, 'hours');
+            entry_date.add(waiting_time_estimation_data.minute, 'minutes');
+            entry_date.add(waiting_time_estimation_data.second, 'seconds'); // 中間発表のため秒を追加する
+
+            return entry_date.toISOString();
+        })
+        // console.log('leave_time_array', leave_time_array);
+    }
+
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = (people_count) => {
+        calculate_leave_time_array();
         let old_next_html = next_html;
         let allow_first_customer = false;
 
         console.log('max_people_in_store', max_people_in_store);
         if (max_people_in_store <= people_count) { // 規制する場合
-            let first_three_in_line = people_in_store_queue.slice(-3); // 店内に最初に入った３人分の入店時間を切り出す
-
-            // 3人分の入店時間に待ち時間推測用データを加算し、規制表示の内容を決定する
-            leave_time_array = first_three_in_line.map((value) => {
-                let entry_date = moment(value); // 格納されていた入店時間データ
-
-                // 待ち時間推測用データ（平均買い物時間）を加算する
-                entry_date.add(waiting_time_estimation_data.hour, 'hours');
-                entry_date.add(waiting_time_estimation_data.minute, 'minutes');
-                entry_date.add(waiting_time_estimation_data.second, 'seconds'); // 中間発表のため秒を追加する
-
-                return entry_date.toISOString();
-            })
             next_html = 'regulation_and_time.html';
             console.log('規制');
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
