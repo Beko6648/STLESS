@@ -93,6 +93,15 @@ app.once('ready', () => {
             }
         }
         store.set('display_setting', display_setting);
+
+        // システム設定の初期値を設定
+        const system_setting = {
+            max_people_in_store: 10,
+            system_start_time: '07:00',
+            system_end_time: '20:00'
+        }
+        store.set('system_setting', system_setting);
+
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             // console.log(results);
