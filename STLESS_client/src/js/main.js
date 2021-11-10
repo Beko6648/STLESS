@@ -19,7 +19,7 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 
 // オプションとして変更できる変数の初期化
 let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
-let debug_mode = true // デバッグモード
+let debug_mode = false // デバッグモード
 
 // 変数の初期化
 let store_window = null;
@@ -66,6 +66,21 @@ app.once('ready', () => {
             backgroundThrottling: false,
         }
     });
+
+    chart_window = new BrowserWindow({
+        show: true,
+        backgroundColor: '#F8F9FA',
+        width: 1000,
+        height: 800,
+        title: 'chart',
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            pageVisibility: true,
+            backgroundThrottling: false,
+        }
+    });
+    chart_window.loadFile(path.join(__dirname, '../store_process/html/chartjs_test.html'));
 
     // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
@@ -177,8 +192,9 @@ app.once('ready', () => {
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     pyshell.on('message', function (enter_or_leave) {
         // console.log('enter_or_leave', enter_or_leave);
-        people_in_store_queue_control(enter_or_leave);
-        regulatory_process();
+        people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
+        calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
+        regulatory_process(); // 規制判断を行う
 
         // 店内客数の変化を規制情報確認画面用に通知する
         store_window.webContents.send('update_regulation_info', {
@@ -189,7 +205,7 @@ app.once('ready', () => {
 
 
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
-    let people_in_store_queue_control = async (enter_or_leave) => {
+    let people_in_store_queue_control = (enter_or_leave) => {
         // const arg_date = moment(time_data);
         const arg_date = moment();
 
@@ -230,7 +246,6 @@ app.once('ready', () => {
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
     let regulatory_process = () => {
-        calculate_leave_time_array();
         let people_count = people_in_store_queue.length;
         let old_next_html = next_html;
         let allow_first_customer = false;
