@@ -12,6 +12,7 @@ const httpServer = require("http").createServer(express_app);
 const options = { /* ... */ };
 const io = require("socket.io")(httpServer, options);
 const mysql = require('mysql');
+const cron = require('node-cron');
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -30,9 +31,8 @@ let leave_time_array = []; // ３人分の予想退店時間が格納された�
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
 let is_allow_first_customer = false; // 先頭のお客様を許可するかどうか
 let max_people_in_store = null; // 店舗最大許容人数
-if (store.has('system_setting')) {
-    max_people_in_store = store.get('system_setting').max_people_in_store;
-}
+if (store.has('system_setting')) max_people_in_store = store.get('system_setting').max_people_in_store;
+let is_system_running = true; // システムの動作時間内かどうか
 
 
 // アプリの起動準備が完了したら
@@ -42,6 +42,25 @@ app.once('ready', () => {
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
     store.clear();
+
+    // 1時間おきにシステムの動作期間内かどうかを確認する
+    cron.schedule('0 0 */1 * * *', () => {
+        console.log('1時間おきの実行');
+        // const system_setting = {
+        //     max_people_in_store: 10,
+        //     system_start_time: '07:00',
+        //     system_end_time: '20:00'
+        // }
+        const system_setting = store.get('system_setting');
+
+        const system_start_time = moment(system_setting.system_start_time, 'HH:mm');
+        const system_end_time = moment(system_setting.system_end_time, 'HH:mm');
+        const now = moment().format('HH:mm');
+        const is_between = moment(now, 'HH:mm').isBetween(system_start_time, system_end_time);
+
+        console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
+
+    });
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -118,6 +137,7 @@ app.once('ready', () => {
         }
         store.set('system_setting', system_setting);
 
+
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             // console.log(results);
@@ -191,16 +211,20 @@ app.once('ready', () => {
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     pyshell.on('message', function (enter_or_leave) {
-        // console.log('enter_or_leave', enter_or_leave);
-        people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
-        calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
-        regulatory_process(); // 規制判断を行う
+        if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+            // console.log('enter_or_leave', enter_or_leave);
+            people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
+            calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
+            regulatory_process(); // 規制判断を行う
 
-        // 店内客数の変化を規制情報確認画面用に通知する
-        store_window.webContents.send('update_regulation_info', {
-            number_of_people: people_in_store_queue.length,
-            regulatory_status: next_html
-        });
+            // 店内客数の変化を規制情報確認画面用に通知する
+            store_window.webContents.send('update_regulation_info', {
+                number_of_people: people_in_store_queue.length,
+                regulatory_status: next_html
+            });
+        } else {
+            console.log('システム終了時刻を過ぎています');
+        }
     });
 
 
