@@ -19,6 +19,7 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 
 // オプションとして変更できる変数の初期化
 let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
+let debug_mode = true // デバッグモード
 
 // 変数の初期化
 let store_window = null;
@@ -124,8 +125,17 @@ app.once('ready', () => {
     // socket.ioのテスト用
     io.on('connection', function (socket) {
         console.log('connected------------------------------------------------------');
-        socket.on('python', function (msg) {
-            console.log(msg);
+        socket.on('python', function (enter_or_leave) {
+            console.log(enter_or_leave);
+            // console.log('enter_or_leave', enter_or_leave);
+            people_in_store_queue_control(enter_or_leave);
+            regulatory_process();
+
+            // 店内客数の変化を規制情報確認画面用に通知する
+            store_window.webContents.send('update_regulation_info', {
+                number_of_people: people_in_store_queue.length,
+                regulatory_status: next_html
+            });
         });
     });
 
@@ -151,24 +161,24 @@ app.once('ready', () => {
 
     // pythonとの通信
 
-    express_app.get('/python', function (req, res) {
-        res.send("hello");
-        console.log(req);
-    })
+    // express_app.get('/python', function (req, res) {
+    //     res.send("hello");
+    //     console.log(req);
+    // })
 
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'text', pythonOptions: ['-u'] })
     // let pyshell = new PythonShell(path.join(__dirname, '../python/People-Counting/run_class.py'), { mode: 'json', pythonOptions: ['-u'] });
 
     console.log('init_pyshell');
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
-    pyshell.on('message', function (data) {
-        // console.log('data', data);
-        people_in_store_queue_control(data.time_data, data.enter_or_leave);
-        regulatory_process(data.people_count);
+    pyshell.on('message', function (enter_or_leave) {
+        // console.log('enter_or_leave', enter_or_leave);
+        people_in_store_queue_control(enter_or_leave);
+        regulatory_process();
 
         // 店内客数の変化を規制情報確認画面用に通知する
         store_window.webContents.send('update_regulation_info', {
@@ -179,8 +189,9 @@ app.once('ready', () => {
 
 
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
-    let people_in_store_queue_control = async (time_data, enter_or_leave) => {
-        const arg_date = moment(time_data);
+    let people_in_store_queue_control = async (enter_or_leave) => {
+        // const arg_date = moment(time_data);
+        const arg_date = moment();
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
             people_in_store_queue.push(arg_date);
@@ -196,7 +207,7 @@ app.once('ready', () => {
         } else {
             console.log('enterかleaveを入力してください');
         }
-        console.log('店内客数', people_in_store_queue.length);
+        if (debug_mode) console.log('店内客数', people_in_store_queue.length);
     }
 
     // 推定退店時間を計算する関数
@@ -214,19 +225,19 @@ app.once('ready', () => {
 
             return entry_date.toISOString();
         })
-        // console.log('leave_time_array', leave_time_array);
+        // if (debug_mode) console.log('leave_time_array', leave_time_array);
     }
 
     // 客が出入りしたときに呼ばれ、規制判断を行う関数
-    let regulatory_process = (people_count) => {
+    let regulatory_process = () => {
         calculate_leave_time_array();
+        let people_count = people_in_store_queue.length;
         let old_next_html = next_html;
         let allow_first_customer = false;
 
-        console.log('max_people_in_store', max_people_in_store);
         if (max_people_in_store <= people_count) { // 規制する場合
             next_html = 'regulation_and_time.html';
-            console.log('規制');
+            if (debug_mode) console.log('規制');
         } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・通知する
@@ -234,7 +245,7 @@ app.once('ready', () => {
                 allow_first_customer = true;
             }
             next_html = 'regulation_nearing.html';
-            console.log('規制間近');
+            if (debug_mode) console.log('規制間近');
         } else {
             if (next_html === 'regulation_and_time.html') {
                 // 先頭のお客様・・・通知する
@@ -242,7 +253,7 @@ app.once('ready', () => {
                 allow_first_customer = true;
             }
             next_html = 'allow_entry.html';
-            console.log('許可');
+            if (debug_mode) console.log('許可');
         }
 
         // 規制状態が変化したら、規制情報確認画面に通知する
