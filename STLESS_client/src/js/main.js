@@ -43,24 +43,6 @@ app.once('ready', () => {
     // テスト用：設定情報をクリアする
     store.clear();
 
-    // 1時間おきにシステムの動作期間内かどうかを確認する
-    cron.schedule('0 0 */1 * * *', () => {
-        console.log('1時間おきの実行');
-        // const system_setting = {
-        //     max_people_in_store: 10,
-        //     system_start_time: '07:00',
-        //     system_end_time: '20:00'
-        // }
-        const system_setting = store.get('system_setting');
-
-        const system_start_time = moment(system_setting.system_start_time, 'HH:mm');
-        const system_end_time = moment(system_setting.system_end_time, 'HH:mm');
-        const now = moment().format('HH:mm');
-        const is_between = moment(now, 'HH:mm').isBetween(system_start_time, system_end_time);
-
-        console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
-
-    });
 
     // mysqlへの接続
     let connection = mysql.createConnection({
@@ -68,6 +50,54 @@ app.once('ready', () => {
         user: 'root',
         password: '',
         database: 'stless_db'
+    });
+
+
+    // バッチ処理
+    const batch_process = () => {
+        const store_id = store.get('store_id');
+
+        console.log('shopping_time_queue', shopping_time_queue);
+
+        shopping_time_queue.forEach(data => {
+            const enter_time = moment(data.enter_time, 'HH:mm');
+            const leave_time = moment(data.leave_time, 'HH:mm');
+            const diff_time = leave_time.diff(enter_time, 'minutes');
+
+            const now_date = moment().format('YYYY-MM-DD');
+
+            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time) VALUES ('${store_id}', '${now_date}', '${diff_time}')`, function (error, results, fields) {
+                if (error) throw error;
+                console.log(results);
+            });
+        }).then = () => {
+            // １日分のデータを送信し終わったら、送信済みのデータを削除する
+            shopping_time_queue = [];
+        }
+    }
+
+    // 1時間おきにシステムの動作期間内かどうかを確認する
+    // cron.schedule('0 0 */1 * * *', () => {
+    cron.schedule('0 */1 * * * *', () => {
+        console.log('1時間おきの実行');
+        const old_is_system_running = is_system_running;
+        const system_setting = store.get('system_setting');
+
+        const system_start_time = moment(system_setting.system_start_time, 'HH:mm');
+        const system_end_time = moment(system_setting.system_end_time, 'HH:mm');
+        const now = moment().format('HH:mm');
+        const is_between = moment(now, 'HH:mm').isBetween(system_start_time, system_end_time);
+
+        is_system_running = is_between;
+
+        if (old_is_system_running === true && is_system_running === false) {
+            console.log('システムが停止しました');
+            // バッチ処理を行う
+            batch_process();
+        }
+
+        console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
+
     });
 
 
@@ -133,7 +163,7 @@ app.once('ready', () => {
         const system_setting = {
             max_people_in_store: 10,
             system_start_time: '07:00',
-            system_end_time: '20:00'
+            system_end_time: '12:00'
         }
         store.set('system_setting', system_setting);
 
