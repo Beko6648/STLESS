@@ -41,7 +41,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    store.clear();
+    // store.clear();
 
 
     // mysqlへの接続
@@ -62,9 +62,9 @@ app.once('ready', () => {
         shopping_time_queue.forEach(data => {
             const enter_time = moment(data.enter_time, 'HH:mm');
             const leave_time = moment(data.leave_time, 'HH:mm');
-            const diff_time = leave_time.diff(enter_time, 'minutes');
+            const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
 
-            const now_date = moment().format('YYYY-MM-DD');
+            const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
 
             connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time) VALUES ('${store_id}', '${now_date}', '${diff_time}')`, function (error, results, fields) {
                 if (error) throw error;
@@ -77,8 +77,8 @@ app.once('ready', () => {
     }
 
     // 1時間おきにシステムの動作期間内かどうかを確認する
-    // cron.schedule('0 0 */1 * * *', () => {
-    cron.schedule('0 */1 * * * *', () => {
+    cron.schedule('0 0 */1 * * *', () => {
+        // cron.schedule('0 */1 * * * *', () => {
         console.log('1時間おきの実行');
         const old_is_system_running = is_system_running;
         const system_setting = store.get('system_setting');

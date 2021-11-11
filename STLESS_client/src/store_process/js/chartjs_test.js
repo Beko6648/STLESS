@@ -14,11 +14,16 @@ document.addEventListener('DOMContentLoaded', function () {
         database: 'stless_db'
     });
 
-    store.get('store_id');
+    const store_id = store.get('store_id');
 
-    // connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
-    //     if (error) throw error;
-    //         // console.log(results);
+    let sql_result = [];
+    connection.query(`SELECT shopping_date, shopping_time, people_in_store_count FROM shopping_time_data_table WHERE store_id = '${store_id}'`, function (error, results, fields) {
+        if (error) throw error;
+        sql_result = results;
+    }).on('end', function () {
+        console.log(sql_result);
+    });
+
 
     data = [];
     for (let i = 0; i <= 24; i++) {
