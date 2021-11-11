@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, BrowserView, ipcMain } = require('electron');
 const Store = require('electron-store');
 const store = new Store();
 const path = require('path');
@@ -342,6 +342,20 @@ ipcMain.handle('goto_regulatory_info_view', (event, message) => {
 ipcMain.handle('goto_system_setting', (event, message) => {
     console.log(message);
     store_window.loadFile(path.join(__dirname, '../store_process/html/system_setting.html'));
+    return true;
+})
+
+ipcMain.handle('camera_streaming', (event, message) => {
+    console.log(message);
+    let view = new BrowserView({
+        webPreferences: {
+            nodeIntegration: false
+        }
+    })
+    store_window.setBrowserView(view)
+    view.setBounds({ x: 0, y: 0, width: 800, height: 500 })
+    view.webContents.loadURL('http://10.10.51.218:5000/')
+    // window.open('http://10.10.51.218:5000/', '_blank', 'top=500,left=200,frame=false,nodeIntegration=no');
     return true;
 })
 

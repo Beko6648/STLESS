@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })()
     })
 
+    document.querySelector('#camera_streaming_button').addEventListener('click', () => {
+        (async () => {
+            const data = await ipcRenderer.invoke('camera_streaming', 'camera_streaming:fromRegulatory_info_view');
+            console.log('camera_streaming', data);
+        })()
+    })
+
     // カメラ設定画面を廃止したのでコメントアウト
     // document.querySelector('#camera_setting_button').addEventListener('click', () => {
     //     (async () => {
