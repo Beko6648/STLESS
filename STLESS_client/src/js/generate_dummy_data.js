@@ -45,7 +45,7 @@ const generate_dummy_data = () => {
             continue;
         }
 
-        const is_run_event = Math.random() > 0.7; // 入退店イベントが起きるかどうか
+        const is_run_event = Math.random() > 0.6; // 入退店イベントが起きるかどうか
         const enter_or_leave = Math.random() > 0.5; // 入店か退店か
 
         if (is_run_event) {

@@ -27,6 +27,8 @@ window.addEventListener('DOMContentLoaded', () => {
             anim.play();
             document.querySelector('.regulatory_info').classList.remove('open');
             document.querySelector('.regulatory_info').classList.add('close');
+            document.querySelector('.graph_container').classList.remove('open');
+            document.querySelector('.graph_container').classList.add('close');
             anim.onLoopComplete = (() => {
                 anim.stop();
                 window.location.assign(next_html);
@@ -55,13 +57,113 @@ window.addEventListener('DOMContentLoaded', () => {
     let anim = null;
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/api/display_setting");
+    xhr.open("GET", "/api/display_setting_and_graph_data");
     xhr.addEventListener("load", function (e) {
-        display_setting = JSON.parse(xhr.responseText);
+        graph_data = JSON.parse(xhr.responseText).graph_data;
+        display_setting = JSON.parse(xhr.responseText).display_setting;
         console.log(display_setting);
         document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
         document.querySelector('.regulatory_icon').innerHTML = display_setting.regulation_card.icon_input;
         document.querySelector('.regulatory_message').innerHTML = `${display_setting.regulation_card.title_input}<br>${display_setting.regulation_card.subtitle_input}`;
+
+        graph_data = graph_data.map(function (item) {
+            return {
+                x: moment(item.hour, 'H').add(30, 'minutes').format('HH:mm'),
+                // 100を超えるときには、100にする
+                y: (item.avg / 20 * 100) < 100 ? (item.avg / 20 * 100) : 100
+            }
+        });
+
+        console.log('graph_data', graph_data);
+
+        // グラフの描画
+        let ctx = document.getElementById('mychart');
+        let myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: '店内満員度数',
+                    data: graph_data,
+                    fill: 'origin',
+                    borderColor: `rgba(0, 0, 0, 0.3)`,
+                    backgroundColor: `rgba(0, 0, 0, 0.1)`,
+                    color: '#ffffff',
+                },
+                    // {
+                    //     label: '満員',
+                    //     data: [
+                    //         { x: "06:30", y: 100 }, { x: "21:30", y: 100 }
+                    //     ],
+                    //     // fill: 'origin',
+                    //     borderColor: `rgba(210, 3, 3, 0.8)`,
+                    //     backgroundColor: `rgba(210, 3, 3, 0.8)`,
+                    //     color: '#ffffff',
+                    // }
+                ],
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            parser: 'HH:mm',
+                            unit: 'hour',
+                            stepSize: 1,
+                            min: moment('06:00', 'HH:mm'),
+                            max: moment('22:00', 'HH:mm'),
+                            displayFormats: {
+                                hour: 'HH:mm',
+                            },
+                        },
+                        ticks: {
+                            color: '#000',
+                            font: { size: 30 },
+                            callback: function (value, index, values) {
+                                return moment(value, 'HH:mm').format('H') + '時';
+                            }
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        // max: 120,
+                        max: 100,
+                        ticks: {
+                            color: '#000',
+                            font: { size: 20 },
+                            // maxTicksLimit: 5,
+                            stepSize: 10,
+                            callback: function (value, index, values) {
+                                return value + '%';
+                            }
+                        }
+                    },
+
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: '過去１週間の時間帯別満員度',
+                        color: '#000',
+                        font: {
+                            size: 50
+                        }
+                    },
+                    filler: {
+                        propagate: true
+                    },
+                    labels: {
+                        font: {
+                            size: 40
+                        }
+                    }
+                }
+            }
+        });
+
 
         // アニメーションで使用するコンテナとパラメータを宣言する
         animContainer = document.getElementById('lottie');
@@ -113,6 +215,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             if (!document.querySelector('.regulatory_info').classList.contains('open')) {
                 document.querySelector('.regulatory_info').classList.add('open');
+                document.querySelector('.graph_container').classList.add('open');
             }
         });
         xhr.send();

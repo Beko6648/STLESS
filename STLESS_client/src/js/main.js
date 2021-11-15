@@ -52,6 +52,21 @@ app.once('ready', () => {
         database: 'stless_db'
     });
 
+    // グラフデータを生成し、アプリストレージに保存する
+    const generate_graph_data = () => {
+        const store_id = store.get('store_id');
+        connection.query(`SELECT WEEK(shopping_date) AS week, HOUR(shopping_date) AS hour, ROUND(AVG(people_in_store_count)) AS avg FROM shopping_time_data_table
+                    WHERE store_id = '${store_id}' AND DATEDIFF(CURDATE(),shopping_date)/7 = 0 GROUP BY WEEK(shopping_date), HOUR(shopping_date);`, function (error, results, fields) {
+            if (error) throw error;
+            console.log(results);
+            store.set('graph_data', results);
+        });
+    }
+
+
+    //-------------------------------------------------
+    generate_graph_data();
+
 
     // バッチ処理
     const batch_process = () => {
@@ -73,6 +88,9 @@ app.once('ready', () => {
         }).then = () => {
             // １日分のデータを送信し終わったら、送信済みのデータを削除する
             shopping_time_queue = [];
+
+            // グラフデータを生成し、アプリストレージに保存する
+            generate_graph_data();
         }
     }
 
@@ -116,20 +134,20 @@ app.once('ready', () => {
         }
     });
 
-    chart_window = new BrowserWindow({
-        show: true,
-        backgroundColor: '#F8F9FA',
-        width: 1000,
-        height: 800,
-        title: 'chart',
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            pageVisibility: true,
-            backgroundThrottling: false,
-        }
-    });
-    chart_window.loadFile(path.join(__dirname, '../store_process/html/chartjs_test.html'));
+    // chart_window = new BrowserWindow({
+    //     show: true,
+    //     backgroundColor: '#F8F9FA',
+    //     width: 1000,
+    //     height: 800,
+    //     title: 'chart',
+    //     webPreferences: {
+    //         nodeIntegration: true,
+    //         contextIsolation: false,
+    //         pageVisibility: true,
+    //         backgroundThrottling: false,
+    //     }
+    // });
+    // chart_window.loadFile(path.join(__dirname, '../store_process/html/chartjs_test.html'));
 
     // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
@@ -180,27 +198,35 @@ app.once('ready', () => {
     // 規制情報表示画面を開く
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     // 開発者ツールウィンドウを表示する
-    store_window.webContents.openDevTools();
+    // store_window.webContents.openDevTools();
 
     // ウィンドウの読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
         store_window.show();
     });
 
+
     // socket.ioのテスト用
     io.on('connection', function (socket) {
         console.log('connected------------------------------------------------------');
-        socket.on('python', function (enter_or_leave) {
-            console.log(enter_or_leave);
-            // console.log('enter_or_leave', enter_or_leave);
-            people_in_store_queue_control(enter_or_leave);
-            regulatory_process();
+        socket.on('python', function (data) {
+            console.log(data);
+            console.log('enter_or_leave', data[0]);
+            console.log('camera_id', data[1]);
+            if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+                const camera_id = data[1];
+                people_in_store_queue_control(data[0]); // 店内客数を更新する
+                calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
+                regulatory_process(); // 規制判断を行う
 
-            // 店内客数の変化を規制情報確認画面用に通知する
-            store_window.webContents.send('update_regulation_info', {
-                number_of_people: people_in_store_queue.length,
-                regulatory_status: next_html
-            });
+                // 店内客数の変化を規制情報確認画面用に通知する
+                store_window.webContents.send('update_regulation_info', {
+                    number_of_people: people_in_store_queue.length,
+                    regulatory_status: next_html
+                });
+            } else {
+                console.log('システム終了時刻を過ぎています');
+            }
         });
     });
 
@@ -219,18 +245,19 @@ app.once('ready', () => {
     express_app.get("/api/display_setting", function (req, res, next) {
         res.json(store.get('display_setting'));
     });
+
+    // 規制情報表示にディスプレイ設定とグラフ描画用データを引き渡す
+    express_app.get("/api/display_setting_and_graph_data", function (req, res, next) {
+        res.json({
+            'display_setting': store.get('display_setting'),
+            'graph_data': store.get('graph_data'),
+        });
+    });
+
     // 規制情報表示htmlからのリクエストに対し、待ち時間を格納した配列を返す
     express_app.get("/api/leave_time_array", function (req, res, next) {
         res.json(leave_time_array);
     });
-
-    // pythonとの通信
-
-    // express_app.get('/python', function (req, res) {
-    //     res.send("hello");
-    //     console.log(req);
-    // })
-
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
@@ -347,14 +374,15 @@ ipcMain.handle('goto_system_setting', (event, message) => {
 
 ipcMain.handle('camera_streaming', (event, message) => {
     console.log(message);
-    let view = new BrowserView({
-        webPreferences: {
-            nodeIntegration: false
-        }
-    })
-    store_window.setBrowserView(view)
-    view.setBounds({ x: 0, y: 0, width: 800, height: 500 })
-    view.webContents.loadURL('http://10.10.51.218:5000/')
+    io.emit('camera_streaming', true);
+    // let view = new BrowserView({
+    //     webPreferences: {
+    //         nodeIntegration: false
+    //     }
+    // })
+    // store_window.setBrowserView(view)
+    // view.setBounds({ x: 0, y: 0, width: 800, height: 500 })
+    // view.webContents.loadURL('http://10.10.51.218:5000/')
     // window.open('http://10.10.51.218:5000/', '_blank', 'top=500,left=200,frame=false,nodeIntegration=no');
     return true;
 })

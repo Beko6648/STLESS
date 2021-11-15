@@ -10,6 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.14/lottie.min.js"
         integrity="sha512-G1R66RZMhyLDEcAu92/Kv4sWNypnEiJcM6yhe0PNyiYDaMAKpMrJ6ZLR67xC/RMNGRa8Pm9TxtO8a98F6Ct+Gw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="../js/moment.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../js/regulation_nearing.js"></script>
 </head>
@@ -17,6 +21,9 @@
 <body>
     <div id="lottie"></div>
     <div id="content_container">
+        <div class="graph_container">
+            <canvas id="mychart"></canvas>
+        </div>
         <div class="regulatory_info">
             <div class="regulatory_icon">⚠</div>
             <div class="regulatory_message">
