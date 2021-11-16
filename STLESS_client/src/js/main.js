@@ -123,8 +123,10 @@ app.once('ready', () => {
     store_window = new BrowserWindow({
         show: false,
         backgroundColor: '#F8F9FA',
-        width: 1000,
         height: 800,
+        width: 1000,
+        minHeight: 700,
+        minWidth: 600,
         title: 'STLESS',
         webPreferences: {
             nodeIntegration: true,
