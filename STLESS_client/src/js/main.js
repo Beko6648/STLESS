@@ -33,6 +33,18 @@ let is_allow_first_customer = false; // 先頭のお客様を許可するかど�
 let max_people_in_store = null; // 店舗最大許容人数
 if (store.has('system_setting')) max_people_in_store = store.get('system_setting').max_people_in_store;
 let is_system_running = true; // システムの動作時間内かどうか
+let camera_data = [ // カメラデータ
+    {
+        camera_id: 0,
+        enter_count: 0,
+        leave_count: 0,
+    },
+    {
+        camera_id: 1,
+        enter_count: 0,
+        leave_count: 0,
+    }
+];
 
 
 // アプリの起動準備が完了したら
@@ -95,8 +107,8 @@ app.once('ready', () => {
     }
 
     // 1時間おきにシステムの動作期間内かどうかを確認する
-    cron.schedule('0 0 */1 * * *', () => {
-        // cron.schedule('0 */1 * * * *', () => {
+    // cron.schedule('0 0 */1 * * *', () => {
+    cron.schedule('0 */1 * * * *', () => {
         console.log('1時間おきの実行');
         const old_is_system_running = is_system_running;
         const system_setting = store.get('system_setting');
@@ -200,7 +212,7 @@ app.once('ready', () => {
     // 規制情報表示画面を開く
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     // 開発者ツールウィンドウを表示する
-    // store_window.webContents.openDevTools();
+    store_window.webContents.openDevTools();
 
     // ウィンドウの読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
@@ -208,23 +220,52 @@ app.once('ready', () => {
     });
 
 
-    // socket.ioのテスト用
+    // カメラとの接続
+    // io.on('connection', function (socket) {
+    //     console.log('connected------------------------------------------------------');
+    //     socket.on('python', function (data) {
+    //         console.log(data);
+    //         console.log('enter_or_leave', data[0]);
+    //         console.log('camera_id', data[1]);
+    //         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+    //             const camera_id = data[1];
+    //             people_in_store_queue_control(data[0]); // 店内客数を更新する
+    //             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
+    //             regulatory_process(); // 規制判断を行う
+
+    //             // 店内客数の変化を規制情報確認画面用に通知する
+    //             store_window.webContents.send('update_regulation_info', {
+    //                 number_of_people: people_in_store_queue.length,
+    //                 regulatory_status: next_html,
+    //                 camera_data: data
+    //             });
+    //         } else {
+    //             console.log('システム終了時刻を過ぎています');
+    //         }
+    //     });
+    // });
+
+    // カメラとの接続 改良版
     io.on('connection', function (socket) {
         console.log('connected------------------------------------------------------');
         socket.on('python', function (data) {
             console.log(data);
-            console.log('enter_or_leave', data[0]);
-            console.log('camera_id', data[1]);
+
+            // カメラデータを更新する
+            let enter_or_leave = data[0];
+            let camera_id = data[1];
+            enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+
             if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-                const camera_id = data[1];
-                people_in_store_queue_control(data[0]); // 店内客数を更新する
+                people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
                 calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
                 regulatory_process(); // 規制判断を行う
 
                 // 店内客数の変化を規制情報確認画面用に通知する
                 store_window.webContents.send('update_regulation_info', {
                     number_of_people: people_in_store_queue.length,
-                    regulatory_status: next_html
+                    regulatory_status: next_html,
+                    camera_data: camera_data
                 });
             } else {
                 console.log('システム終了時刻を過ぎています');
@@ -263,15 +304,21 @@ app.once('ready', () => {
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'text', pythonOptions: ['-u'] })
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
     // let pyshell = new PythonShell(path.join(__dirname, '../python/People-Counting/run_class.py'), { mode: 'json', pythonOptions: ['-u'] });
 
     console.log('init_pyshell');
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
-    pyshell.on('message', function (enter_or_leave) {
+    pyshell.on('message', function (data) {
+        console.log(data);
+
+        // カメラデータを更新する
+        let enter_or_leave = data[0];
+        let camera_id = data[1];
+        enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+
         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-            // console.log('enter_or_leave', enter_or_leave);
             people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
             regulatory_process(); // 規制判断を行う
@@ -279,7 +326,8 @@ app.once('ready', () => {
             // 店内客数の変化を規制情報確認画面用に通知する
             store_window.webContents.send('update_regulation_info', {
                 number_of_people: people_in_store_queue.length,
-                regulatory_status: next_html
+                regulatory_status: next_html,
+                camera_data: camera_data
             });
         } else {
             console.log('システム終了時刻を過ぎています');

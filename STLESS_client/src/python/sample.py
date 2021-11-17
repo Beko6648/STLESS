@@ -24,12 +24,25 @@ import pytz
 
 
 
+# while True:
+#     for i in range(10):
+#         print(json.dumps('enter'))
+#         time.sleep(1)
+#     time.sleep(5)
+
+#     for i in range(10):
+#         print(json.dump('leave'))
+#         time.sleep(1)
+
+
 while True:
     for i in range(10):
-        print('enter')
+        random_num = random.randint(0,1)
+        print(json.dumps(['enter', random_num]))
         time.sleep(1)
     time.sleep(5)
 
     for i in range(10):
-        print('leave')
-        time.sleep(2)
+        random_num = random.randint(0,1)
+        print(json.dumps(['leave', random_num]))
+        time.sleep(1)

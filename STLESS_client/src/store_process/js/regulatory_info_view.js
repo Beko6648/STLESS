@@ -47,6 +47,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         document.querySelector('#number_of_people').innerHTML = number_of_people;
+
+
+        // カメラ情報（出入り口情報を更新）
+        regulatory_info_obj.camera_data.forEach(camera_data => {
+            const camera_id = camera_data.camera_id;
+            const enter_count = camera_data.enter_count;
+            const leave_count = camera_data.leave_count;
+
+            let camera_data_element = document.querySelectorAll('.camera_data')[camera_id];
+
+            camera_data_element.querySelector('.enter_count_value').innerHTML = enter_count;
+            camera_data_element.querySelector('.leave_count_value').innerHTML = leave_count;
+        });
+        const enter_or_leave = regulatory_info_obj.camera_data[0];
+        const camera_id = regulatory_info_obj.camera_data[1];
+
+
     })
 
+    ipcRenderer.on('update_camera_data', (event, data) => {
+        const enter_or_leave = data[0];
+        const camera_id = data[1];
+
+        console.log('update_camera_data', data);
+        document.querySelectorAll('.camera_data').forEach((element, index) => {
+            if (index === camera_id) {
+                console.log(element);
+            }
+        })
+    })
 })
