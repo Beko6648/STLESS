@@ -15,9 +15,10 @@
 
 <body class="h-full">
     <div class="flex flex-col justify-between h-full items-center p-1">
-        <div class="border-2 border-black font-bold text-2xl rounded-lg p-1 inline-block">システム設定</div>
-        <div id="display_setting_container" class="flex-auto flex flex-row justify-center">
-            <div id="allow_card" class="display_setting_card flex flex-col rounded-lg m-1 p-1">
+        <div class="border-2 border-black font-bold text-4xl rounded-lg m-2 p-2 inline-block shadow-lg">システム設定</div>
+        <div id="display_setting_container" class="w-full flex-auto flex flex-row justify-around p-1">
+            <div id="allow_card"
+                class="display_setting_card flex-grow flex flex-col rounded-lg m-2 p-1 shadow-lg border border-gray-600">
                 <div class="card_tab flex-grow m-1">
                     <div class="card_title text-center text-gray-700 rounded bg-white px-1 text-2xl font-bold">
                         許可
@@ -56,7 +57,8 @@
                         placeholder="サブタイトル" />
                 </div>
             </div>
-            <div id="near_card" class="display_setting_card flex flex-col rounded-lg m-1 p-1">
+            <div id="near_card"
+                class="display_setting_card flex-grow flex flex-col rounded-lg m-2 p-1 shadow-lg border border-gray-600">
                 <div class="card_tab m-1 flex-grow">
                     <div class="card_title text-center text-gray-700 rounded bg-white px-1 text-2xl font-bold">
                         規制間近
@@ -95,7 +97,8 @@
                         placeholder="サブタイトル" />
                 </div>
             </div>
-            <div id="regulation_card" class="display_setting_card flex flex-col rounded-lg m-1 p-1">
+            <div id="regulation_card"
+                class="display_setting_card flex-grow flex flex-col rounded-lg m-2 p-1 shadow-lg border border-gray-600">
                 <div class="card_tab m-1 flex-grow">
                     <div class="card_title text-center text-gray-700 rounded bg-white px-1 text-2xl font-bold">
                         規制
@@ -174,7 +177,7 @@
         </div>
         <button id="end_system_setting_button"
             class="m-1 flex-grow-0 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-            設定を保存して規制情報表示画面へ
+            設定を保存して戻る
         </button>
     </div>
 </body>

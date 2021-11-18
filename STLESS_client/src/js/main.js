@@ -138,7 +138,7 @@ app.once('ready', () => {
         height: 800,
         width: 1000,
         minHeight: 700,
-        minWidth: 600,
+        minWidth: 800,
         title: 'STLESS',
         webPreferences: {
             nodeIntegration: true,
@@ -194,8 +194,8 @@ app.once('ready', () => {
         // システム設定の初期値を設定
         const system_setting = {
             max_people_in_store: 10,
-            system_start_time: '07:00',
-            system_end_time: '12:00'
+            system_start_time: '06:00',
+            system_end_time: '22:00'
         }
         store.set('system_setting', system_setting);
 
@@ -311,7 +311,7 @@ app.once('ready', () => {
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     pyshell.on('message', function (data) {
-        console.log(data);
+        // console.log(data);
 
         // カメラデータを更新する
         let enter_or_leave = data[0];
@@ -412,14 +412,30 @@ app.once('ready', () => {
 // カメラ設定画面から規制情報表示画面へ遷移させる処理
 ipcMain.handle('goto_regulatory_info_view', (event, message) => {
     console.log(message);
+    console.log(store_window.getSize());
+    if (store_window.getSize()[0] < 800) {
+        store_window.setSize(800, 700);
+    }
+    store_window.setMinimumSize(800, 700);
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     return true;
 })
 
 ipcMain.handle('goto_system_setting', (event, message) => {
     console.log(message);
+    store_window.setMinimumSize(600, 700);
     store_window.loadFile(path.join(__dirname, '../store_process/html/system_setting.html'));
     return true;
+})
+
+ipcMain.handle('get_regulation_info', (event, message) => {
+    console.log(message);
+    const regulation_info = {
+        number_of_people: people_in_store_queue.length,
+        regulatory_status: next_html,
+        camera_data: camera_data
+    }
+    return regulation_info;
 })
 
 ipcMain.handle('camera_streaming', (event, message) => {

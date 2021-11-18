@@ -15,40 +15,50 @@
 
 <body class="h-full">
     <div class="h-full flex flex-col justify-between items-center p-1">
-        <div class="border-2 border-black font-bold text-2xl rounded-lg p-1 inline-block">規制状況確認</div>
-        <div class="flex flex-row justify-around items-center flex-grow w-full">
+        <div class="border-2 border-black font-bold text-4xl rounded-lg m-2 p-2 inline-block">規制状況確認</div>
 
-            <div id="camera_data_container" class="flex flex-col justify-center items-center">
-                <div class="camera_data m-1 p-1 border-2 border-black font-bold text-2xl rounded-lg">
+        <div class="h-full w-full grid grid-flow-col grid-cols-2 grid-rows-2 gap-10 p-10 font-bold text-4xl">
+
+            <div
+                class="camera_data flex flex-col justify-around items-center m-1 p-1 border-2 border-black rounded-lg shadow-2xl">
+                <div>
                     <div class="camera_name">出入り口名:<span class="camera_name_value">カメラ１</span></div>
-                    <div class="enter_count">累計入店数:<span class="enter_count_value">10</span></div>
-                    <div class="leave_count">累計退店数:<span class="leave_count_value">10</span></div>
+                    <div class="enter_count">累計入店数:<span class="enter_count_value"></span></div>
+                    <div class="leave_count">累計退店数:<span class="leave_count_value"></span></div>
                 </div>
-                <div class="camera_data m-1 p-1 border-2 border-black font-bold text-2xl rounded-lg">
+                <button id="camera_streaming_button"
+                    class="text-base bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ映像を見る</button>
+            </div>
+            <div
+                class="camera_data flex flex-col justify-around items-center m-1 p-1 border-2 border-black rounded-lg shadow-2xl">
+                <div>
                     <div class="camera_name">出入り口名:<span class="camera_name_value">カメラ2</span></div>
-                    <div class="enter_count">累計入店数:<span class="enter_count_value">22</span></div>
-                    <div class="leave_count">累計退店数:<span class="leave_count_value">10</span></div>
+                    <div class="enter_count">累計入店数:<span class="enter_count_value"></span></div>
+                    <div class="leave_count">累計退店数:<span class="leave_count_value"></span></div>
                 </div>
+                <button id="camera_streaming_button"
+                    class="text-base bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ映像を見る</button>
             </div>
 
-            <div class="flex flex-col justify-center items-center">
-                <div id="regulatory_status_container" class="font-bold text-2xl m-1">
-                    規制状況:
-                    <span id="regulatory_status" class="font-bold text-2xl"></span>
-                </div>
-                <div id="number_of_people_container" class="font-bold text-2xl m-1">
-                    店内人数:
-                    <span id="number_of_people" class="font-bold text-2xl"></span>
+            <div
+                class="flex flex-col justify-center items-center row-span-2 border-2 border-black rounded-lg shadow-2xl">
+                <div>
+                    <div id="regulatory_status_container" class="m-10">
+                        規制状況:
+                        <span id="regulatory_status"></span>
+                    </div>
+                    <div id="number_of_people_container" class="m-10">
+                        店内人数:
+                        <span id="number_of_people"></span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="flex flex-row justify-between items-center">
             <button id="system_setting_button"
-                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">システム設定画面へ</button>
-            <button id="camera_streaming_button"
-                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ映像を見る</button>
-            <!-- <button id="camera_setting_button"
-                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">カメラ設定画面へ</button> -->
+                class="m-1 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                システム設定
+            </button>
         </div>
     </div>
 </body>

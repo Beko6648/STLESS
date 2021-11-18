@@ -130,14 +130,14 @@ window.addEventListener('DOMContentLoaded', () => {
                     legend: {
                         display: false,
                     },
-                    title: {
-                        display: true,
-                        text: '過去１週間の時間帯別満員度',
-                        color: '#000',
-                        font: {
-                            size: 50
-                        }
-                    },
+                    // title: {
+                    //     display: true,
+                    //     text: '過去１週間の時間帯別満員度',
+                    //     color: '#000',
+                    //     font: {
+                    //         size: 50
+                    //     }
+                    // },
                     filler: {
                         propagate: true
                     },
