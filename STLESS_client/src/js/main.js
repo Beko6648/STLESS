@@ -107,8 +107,8 @@ app.once('ready', () => {
     }
 
     // 1時間おきにシステムの動作期間内かどうかを確認する
-    // cron.schedule('0 0 */1 * * *', () => {
-    cron.schedule('0 */1 * * * *', () => {
+    cron.schedule('0 0 */1 * * *', () => {
+        // cron.schedule('0 */1 * * * *', () => {
         console.log('1時間おきの実行');
         const old_is_system_running = is_system_running;
         const system_setting = store.get('system_setting');
@@ -147,21 +147,6 @@ app.once('ready', () => {
             backgroundThrottling: false,
         }
     });
-
-    // chart_window = new BrowserWindow({
-    //     show: true,
-    //     backgroundColor: '#F8F9FA',
-    //     width: 1000,
-    //     height: 800,
-    //     title: 'chart',
-    //     webPreferences: {
-    //         nodeIntegration: true,
-    //         contextIsolation: false,
-    //         pageVisibility: true,
-    //         backgroundThrottling: false,
-    //     }
-    // });
-    // chart_window.loadFile(path.join(__dirname, '../store_process/html/chartjs_test.html'));
 
     // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
@@ -221,33 +206,11 @@ app.once('ready', () => {
 
 
     // カメラとの接続
-    // io.on('connection', function (socket) {
-    //     console.log('connected------------------------------------------------------');
-    //     socket.on('python', function (data) {
-    //         console.log(data);
-    //         console.log('enter_or_leave', data[0]);
-    //         console.log('camera_id', data[1]);
-    //         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-    //             const camera_id = data[1];
-    //             people_in_store_queue_control(data[0]); // 店内客数を更新する
-    //             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
-    //             regulatory_process(); // 規制判断を行う
-
-    //             // 店内客数の変化を規制情報確認画面用に通知する
-    //             store_window.webContents.send('update_regulation_info', {
-    //                 number_of_people: people_in_store_queue.length,
-    //                 regulatory_status: next_html,
-    //                 camera_data: data
-    //             });
-    //         } else {
-    //             console.log('システム終了時刻を過ぎています');
-    //         }
-    //     });
-    // });
-
-    // カメラとの接続 改良版
     io.on('connection', function (socket) {
         console.log('connected------------------------------------------------------');
+        // 規制情報表示ディスプレイからの接続があったときに現在表示すべき規制情報を送信する
+        io.emit('next_html', next_html);
+
         socket.on('python', function (data) {
             console.log(data);
 
