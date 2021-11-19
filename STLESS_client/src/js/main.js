@@ -77,7 +77,7 @@ app.once('ready', () => {
 
 
     //-------------------------------------------------
-    generate_graph_data();
+    // generate_graph_data();
 
 
     // バッチ処理
@@ -135,10 +135,10 @@ app.once('ready', () => {
     store_window = new BrowserWindow({
         show: false,
         backgroundColor: '#F8F9FA',
-        height: 800,
         width: 1000,
-        minHeight: 700,
+        height: 800,
         minWidth: 800,
+        minHeight: 800,
         title: 'STLESS',
         webPreferences: {
             nodeIntegration: true,
@@ -376,17 +376,17 @@ app.once('ready', () => {
 ipcMain.handle('goto_regulatory_info_view', (event, message) => {
     console.log(message);
     console.log(store_window.getSize());
-    if (store_window.getSize()[0] < 800) {
-        store_window.setSize(800, 700);
+    if (store_window.getSize()[0] < 800 || store_window.getSize()[1] < 800) {
+        store_window.setSize(800, 800);
     }
-    store_window.setMinimumSize(800, 700);
+    store_window.setMinimumSize(800, 800);
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     return true;
 })
 
 ipcMain.handle('goto_system_setting', (event, message) => {
     console.log(message);
-    store_window.setMinimumSize(600, 700);
+    store_window.setMinimumSize(600, 750);
     store_window.loadFile(path.join(__dirname, '../store_process/html/system_setting.html'));
     return true;
 })

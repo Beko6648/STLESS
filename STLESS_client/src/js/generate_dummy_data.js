@@ -1,5 +1,6 @@
 const moment = require("moment");
 const mysql = require('mysql');
+const { resolve } = require("path/posix");
 
 // mysqlへの接続
 let connection = mysql.createConnection({
@@ -11,6 +12,15 @@ let connection = mysql.createConnection({
 
 const get_random_int = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+const delete_shopping_time_data = async () => {
+    connection.query(`DELETE FROM shopping_time_data_table`, function (error, results, fields) {
+        if (error) throw error;
+        // console.log(results);
+    }).on('end', () => {
+        return true;
+    })
 }
 
 
@@ -45,8 +55,8 @@ const generate_dummy_data = () => {
             continue;
         }
 
-        const is_run_event = Math.random() > 0.6; // 入退店イベントが起きるかどうか
-        const enter_or_leave = Math.random() > 0.5; // 入店か退店か
+        const is_run_event = Math.random() < 0.4; // 入退店イベントが起きるかどうか
+        const enter_or_leave = Math.random() < 0.5; // 入店か退店か
 
         if (is_run_event) {
             if (enter_or_leave) { // 入店
@@ -76,10 +86,11 @@ const generate_dummy_data = () => {
         connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time, people_in_store_count) VALUES ('${store_id}', '${enter_time}', '${diff_time}', '${people_in_store_count}')`, function (error, results, fields) {
             if (error) throw error;
             // console.log(results);
-        }).on('end', () => {
-            console.log('end');
-        });
+        })
     });
 }
 
-generate_dummy_data();
+(async () => {
+    // await delete_shopping_time_data();
+    generate_dummy_data();
+})();
