@@ -134,12 +134,12 @@ app.once('ready', () => {
     // ウィンドウの設定
     store_window = new BrowserWindow({
         show: false,
+        title: 'STLESS',
         backgroundColor: '#F8F9FA',
         width: 1000,
         height: 800,
         minWidth: 800,
         minHeight: 800,
-        title: 'STLESS',
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
