@@ -65,8 +65,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
     // カラーピッカー
-    document.querySelector('input[type=color]').addEventListener('change', (e) => {
-        e.target.parentElement.style.backgroundColor = e.target.value;
+    document.querySelectorAll('input[type=color]').forEach((item) => {
+        item.addEventListener('change', (e) => {
+            console.log('change');
+            e.target.parentElement.style.backgroundColor = e.target.value;
+        })
     })
 
     const colorPickers = document.querySelectorAll(

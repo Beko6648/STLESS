@@ -11,9 +11,10 @@
 
 html {
 	font-family: DotGothic;
+	background-color: #333333;
 }
 
-body {
+/* body {
 	height: 100%;
 }
 
@@ -34,4 +35,4 @@ body {
 	height: 100%;
 	font-size: 400%;
 	text-align: center;
-}
+} */

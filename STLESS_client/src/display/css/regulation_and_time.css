@@ -6,8 +6,12 @@ html {
 .icon_and_time_container {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+}
+
+.regulatory_icon {
+	margin-top: 0%;
 }
 
 .waiting_time_display {
@@ -23,4 +27,9 @@ html {
 
 .waiting_time {
 	margin-top: 20px;
+}
+
+.soon {
+	font-size: 70%;
+	font-weight: 900;
 }

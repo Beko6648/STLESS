@@ -40,6 +40,12 @@ body {
 	flex-direction: column;
 }
 
+.graph_container {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+
 .regulatory_info {
 	height: 80%;
 	width: 100%;
