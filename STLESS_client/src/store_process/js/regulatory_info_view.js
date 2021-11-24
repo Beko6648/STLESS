@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })()
     })
 
-    document.querySelector('#camera_streaming_button').addEventListener('click', () => {
-        (async () => {
-            const data = await ipcRenderer.invoke('camera_streaming', 'camera_streaming:fromRegulatory_info_view');
-            console.log('camera_streaming', data);
-        })()
+    document.querySelectorAll('.camera_streaming_button').forEach((element) => {
+        element.addEventListener('click', () => {
+            (async () => {
+                const data = await ipcRenderer.invoke('camera_streaming', 'camera_streaming:fromRegulatory_info_view');
+                console.log('camera_streaming', data);
+            })()
+        })
     })
 
     // 店内客数が変化したタイミングで送られてくる規制情報を元に表示を更新する

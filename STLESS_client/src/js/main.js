@@ -234,6 +234,10 @@ app.once('ready', () => {
                 console.log('システム終了時刻を過ぎています');
             }
         });
+
+        socket.on('/', function (data) {
+            console.log(data);
+        })
     });
 
 
@@ -404,15 +408,24 @@ ipcMain.handle('get_regulation_info', (event, message) => {
 ipcMain.handle('camera_streaming', (event, message) => {
     console.log(message);
     io.emit('camera_streaming', true);
-    // let view = new BrowserView({
-    //     webPreferences: {
-    //         nodeIntegration: false
-    //     }
-    // })
-    // store_window.setBrowserView(view)
-    // view.setBounds({ x: 0, y: 0, width: 800, height: 500 })
-    // view.webContents.loadURL('http://10.10.51.218:5000/')
-    // window.open('http://10.10.51.218:5000/', '_blank', 'top=500,left=200,frame=false,nodeIntegration=no');
+
+    let camera_streaming_window = new BrowserWindow({
+        show: true,
+        title: 'CAMERA_STREAMING',
+        backgroundColor: '#F8F9FA',
+        width: 800,
+        height: 600,
+        // minWidth: 800,
+        // minHeight: 800,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            pageVisibility: true,
+            backgroundThrottling: false,
+        }
+    });
+
+    camera_streaming_window.loadURL('http://10.10.51.218:5000/');
     return true;
 })
 
