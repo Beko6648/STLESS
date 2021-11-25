@@ -30,9 +30,12 @@ class SocketIOClient:
 
     def my_background_task(self, my_argument): # ここにバックグランド処理のコードを書く
         self.sio.emit('python', my_argument, namespace = self.path) # ターミナルで入力された文字をサーバーに送信
-            
 
 if __name__ == '__main__':
     sio_client = SocketIOClient('http://10.10.50.184:3000/', '/') # SocketIOClientクラスをインスタンス化
     sio_client.connect()
-    sio_client.my_background_task(21324)
+    sio_client.my_background_task(['enter',1])
+
+    @sio_client.sio.on('start_streaming')
+    def on_start_streaming(data):
+        print('I received a message!')

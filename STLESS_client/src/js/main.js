@@ -407,7 +407,7 @@ ipcMain.handle('get_regulation_info', (event, message) => {
 
 ipcMain.handle('camera_streaming', (event, message) => {
     console.log(message);
-    io.emit('camera_streaming', true);
+    io.emit('start_streaming', true);
 
     let camera_streaming_window = new BrowserWindow({
         show: true,
