@@ -1,4 +1,4 @@
-/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v2.2.17 | MIT License | https://tailwindcss.com */
 
 /*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
 
@@ -736,7 +736,6 @@ video {
 }
 
 .sticky {
-  position: -webkit-sticky;
   position: sticky;
 }
 
@@ -32245,10 +32244,20 @@ video {
   content: none;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap");
+
+.my-box-dark {
+  background-color: #333333;
+  color: #f2f2f2;
+}
+
+.my-box-light {
+  background-color: #f2f2f2;
+  color: #333333;
+}
 
 .my-font-family {
-  font-family: 'Kosugi Maru', sans-serif;
+  font-family: "Kosugi Maru", sans-serif;
 }
 
 .my-bg {
@@ -32266,6 +32275,10 @@ video {
 
 .my-bg-blue {
   background-color: #29649c;
+}
+
+.my-text-white {
+  color: #f2f2f2;
 }
 
 .my-text-black {
@@ -32423,7 +32436,6 @@ video {
   }
 
   .sm\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -63651,7 +63663,6 @@ video {
   }
 
   .md\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -94879,7 +94890,6 @@ video {
   }
 
   .lg\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -126107,7 +126117,6 @@ video {
   }
 
   .xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 
@@ -157335,7 +157344,6 @@ video {
   }
 
   .\32xl\:sticky {
-    position: -webkit-sticky;
     position: sticky;
   }
 

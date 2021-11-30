@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
         })()
     })
 
-    document.querySelectorAll('.camera_streaming_button').forEach((element) => {
+    document.querySelectorAll('.camera_streaming_button').forEach((element, index) => {
         element.addEventListener('click', () => {
             (async () => {
-                const data = await ipcRenderer.invoke('camera_streaming', 'camera_streaming:fromRegulatory_info_view');
+                const data = await ipcRenderer.invoke('camera_streaming', index);
                 console.log('camera_streaming', data);
             })()
         })
@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // カメラ情報（出入り口情報を更新）
         regulation_info_obj.camera_data.forEach(camera_data => {
+            console.log('camera_data', camera_data);
             const camera_id = camera_data.camera_id;
             const enter_count = camera_data.enter_count;
             const leave_count = camera_data.leave_count;

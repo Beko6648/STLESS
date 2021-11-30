@@ -38,11 +38,15 @@ let camera_data = [ // カメラデータ
         camera_id: 0,
         enter_count: 0,
         leave_count: 0,
+        streaming_address: 'http://10.10.50.196:8000/',
+        is_open_window: false,
     },
     {
         camera_id: 1,
         enter_count: 0,
         leave_count: 0,
+        streaming_address: 'http://10.10.50.196:8000/',
+        is_open_window: false,
     }
 ];
 
@@ -64,7 +68,7 @@ app.once('ready', () => {
         database: 'stless_db'
     });
 
-    // グラフデータを生成し、アプリストレージに保存する
+    // グラフデータを生成し、アプリストレージに保存する関数
     const generate_graph_data = () => {
         const store_id = store.get('store_id');
         connection.query(`SELECT WEEK(shopping_date) AS week, HOUR(shopping_date) AS hour, ROUND(AVG(people_in_store_count)) AS avg FROM shopping_time_data_table
@@ -80,55 +84,7 @@ app.once('ready', () => {
     // generate_graph_data();
 
 
-    // バッチ処理
-    const batch_process = () => {
-        const store_id = store.get('store_id');
 
-        console.log('shopping_time_queue', shopping_time_queue);
-
-        shopping_time_queue.forEach(data => {
-            const enter_time = moment(data.enter_time, 'HH:mm');
-            const leave_time = moment(data.leave_time, 'HH:mm');
-            const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
-
-            const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
-
-            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time) VALUES ('${store_id}', '${now_date}', '${diff_time}')`, function (error, results, fields) {
-                if (error) throw error;
-                console.log(results);
-            });
-        }).then = () => {
-            // １日分のデータを送信し終わったら、送信済みのデータを削除する
-            shopping_time_queue = [];
-
-            // グラフデータを生成し、アプリストレージに保存する
-            generate_graph_data();
-        }
-    }
-
-    // 1時間おきにシステムの動作期間内かどうかを確認する
-    cron.schedule('0 0 */1 * * *', () => {
-        // cron.schedule('0 */1 * * * *', () => {
-        console.log('1時間おきの実行');
-        const old_is_system_running = is_system_running;
-        const system_setting = store.get('system_setting');
-
-        const system_start_time = moment(system_setting.system_start_time, 'HH:mm');
-        const system_end_time = moment(system_setting.system_end_time, 'HH:mm');
-        const now = moment().format('HH:mm');
-        const is_between = moment(now, 'HH:mm').isBetween(system_start_time, system_end_time);
-
-        is_system_running = is_between;
-
-        if (old_is_system_running === true && is_system_running === false) {
-            console.log('システムが停止しました');
-            // バッチ処理を行う
-            batch_process();
-        }
-
-        console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
-
-    });
 
 
     // ウィンドウの設定
@@ -152,8 +108,8 @@ app.once('ready', () => {
     if (!store.has('store_id')) {
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
-        store.set('store_id', store_id);
-        // 規制情報表示ディスプレイの初期設定を行う
+
+        // 規制情報表示ディスプレイの初期設定
         const display_setting = {
             "allow_card": {
                 "color_input": "#00a03e",
@@ -174,30 +130,29 @@ app.once('ready', () => {
                 "subtitle_input": "間隔を空けてお待ち下さい"
             }
         }
-        store.set('display_setting', display_setting);
 
-        // システム設定の初期値を設定
+        // システム設定の初期設定
         const system_setting = {
             max_people_in_store: 10,
             system_start_time: '06:00',
             system_end_time: '22:00'
         }
+
+        // ストアに初期値を保存
+        store.set('store_id', store_id);
+        store.set('display_setting', display_setting);
         store.set('system_setting', system_setting);
 
-
+        // 店舗IDをDBに登録
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
             // console.log(results);
         });
-        // 初期設定画面を表示する
-        // store_window.loadFile(path.join(__dirname, '../store_process/html/initial_setting.html'));
-    } else { // 店舗IDが保存されていれば、規制情報表示画面を開く
-        // store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     }
     // 規制情報表示画面を開く
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
     // 開発者ツールウィンドウを表示する
-    store_window.webContents.openDevTools();
+    // store_window.webContents.openDevTools();
 
     // ウィンドウの読み込みが完了してからウィンドウを表示する
     store_window.once('ready-to-show', () => {
@@ -205,7 +160,8 @@ app.once('ready', () => {
     });
 
 
-    // カメラとの接続
+
+    // socket.ioでのカメラとの接続
     io.on('connection', function (socket) {
         console.log('connected------------------------------------------------------');
         // 規制情報表示ディスプレイからの接続があったときに現在表示すべき規制情報を送信する
@@ -213,6 +169,9 @@ app.once('ready', () => {
 
         socket.on('python', function (data) {
             console.log(data);
+
+            // プログラム起動時には、falseを受け取り、スルーするように
+            if (data === false) return;
 
             // カメラデータを更新する
             let enter_or_leave = data[0];
@@ -246,10 +205,12 @@ app.once('ready', () => {
     });
 
 
+
+    // 規制情報表示ディスプレイAPI------------------------------------------------------------------------
+
     // 規制情報表示ディスプレイのためにhttpサーバを立てる
     express_app.use(express.static(path.join(__dirname, '../display')));
     // express_app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
-
 
     // 規制情報表示にディスプレイ設定を引き渡す
     express_app.get("/api/display_setting", function (req, res, next) {
@@ -270,11 +231,9 @@ app.once('ready', () => {
     });
 
 
-    //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'
-    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
-    // let pyshell = new PythonShell(path.join(__dirname, '../python/People-Counting/run_class.py'), { mode: 'json', pythonOptions: ['-u'] });
 
-    console.log('init_pyshell');
+    //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'----------------------------------------------------------------
+    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     pyshell.on('message', function (data) {
@@ -374,12 +333,63 @@ app.once('ready', () => {
             io.emit('next_html', next_html);
         }
     }
+
+
+    // バッチ処理
+    const batch_process = () => {
+        const store_id = store.get('store_id');
+
+        console.log('shopping_time_queue', shopping_time_queue);
+
+        shopping_time_queue.forEach(data => {
+            const enter_time = moment(data.enter_time, 'HH:mm');
+            const leave_time = moment(data.leave_time, 'HH:mm');
+            const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
+
+            const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time) VALUES ('${store_id}', '${now_date}', '${diff_time}')`, function (error, results, fields) {
+                if (error) throw error;
+                console.log(results);
+            });
+        }).then = () => {
+            // １日分のデータを送信し終わったら、送信済みのデータを削除する
+            shopping_time_queue = [];
+
+            // グラフデータを生成し、アプリストレージに保存する
+            generate_graph_data();
+        }
+    }
+
+    // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
+    cron.schedule('0 0 */1 * * *', () => {
+        // cron.schedule('0 */1 * * * *', () => {
+        console.log('1時間おきの実行');
+        const old_is_system_running = is_system_running;
+        const system_setting = store.get('system_setting');
+
+        const system_start_time = moment(system_setting.system_start_time, 'HH:mm');
+        const system_end_time = moment(system_setting.system_end_time, 'HH:mm');
+        const now = moment().format('HH:mm');
+        const is_between = moment(now, 'HH:mm').isBetween(system_start_time, system_end_time);
+
+        is_system_running = is_between;
+
+        if (old_is_system_running === true && is_system_running === false) {
+            console.log('システムが停止しました');
+            // バッチ処理を行う
+            batch_process();
+        }
+
+        console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
+
+    });
+
 });
 
 // カメラ設定画面から規制情報表示画面へ遷移させる処理
 ipcMain.handle('goto_regulatory_info_view', (event, message) => {
     console.log(message);
-    console.log(store_window.getSize());
     if (store_window.getSize()[0] < 800 || store_window.getSize()[1] < 800) {
         store_window.setSize(800, 800);
     }
@@ -388,6 +398,7 @@ ipcMain.handle('goto_regulatory_info_view', (event, message) => {
     return true;
 })
 
+// カメラ設定画面から規制情報表示画面へ遷移させる処理
 ipcMain.handle('goto_system_setting', (event, message) => {
     console.log(message);
     store_window.setMinimumSize(600, 750);
@@ -405,27 +416,47 @@ ipcMain.handle('get_regulation_info', (event, message) => {
     return regulation_info;
 })
 
-ipcMain.handle('camera_streaming', (event, message) => {
-    console.log(message);
+ipcMain.handle('camera_streaming', (event, camera_id) => {
+    if (camera_data[camera_id].is_open_window === true) return;
+
+    camera_data[camera_id].is_open_window = true;
+
+    console.log('camera_id', camera_id);
+
     io.emit('start_streaming', true);
 
-    let camera_streaming_window = new BrowserWindow({
-        show: true,
-        title: 'CAMERA_STREAMING',
-        backgroundColor: '#F8F9FA',
-        width: 800,
-        height: 600,
-        // minWidth: 800,
-        // minHeight: 800,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            pageVisibility: true,
-            backgroundThrottling: false,
-        }
-    });
+    let camera_streaming_window = {
+        window: new BrowserWindow({
+            show: true,
+            title: 'CAMERA_STREAMING',
+            backgroundColor: '#F8F9FA',
+            width: 800,
+            height: 600,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+                pageVisibility: true,
+                backgroundThrottling: false,
+            }
+        }),
+        camera_id: camera_id
+    }
 
-    camera_streaming_window.loadURL('http://10.10.51.218:5000/');
+    camera_streaming_window.window.on('close', () => { camera_data[camera_streaming_window.camera_id].is_open_window = false });
+
+
+    // camera_data[0].streaming_window.on('closed', () => { console.log('camera_id:0 window closed'); });
+    // camera_data[1].streaming_window.on('closed', () => { console.log('camera_id:1 window closed'); });
+
+    switch (camera_id) {
+        case 0:
+            camera_streaming_window.window.loadURL(camera_data[camera_id].streaming_address);
+            break;
+        case 1:
+            camera_streaming_window.window.loadURL(camera_data[camera_id].streaming_address);
+            break;
+    }
+
     return true;
 })
 

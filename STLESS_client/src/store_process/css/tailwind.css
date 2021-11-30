@@ -5,10 +5,20 @@
 @tailwind utilities;
 
 @layer utilities {
-	@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+	@import url("https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap");
+
+	.my-box-dark {
+		background-color: #333333;
+		color: #f2f2f2;
+	}
+
+	.my-box-light {
+		background-color: #f2f2f2;
+		color: #333333;
+	}
 
 	.my-font-family {
-		font-family: 'Kosugi Maru', sans-serif;
+		font-family: "Kosugi Maru", sans-serif;
 	}
 
 	.my-bg {
@@ -26,6 +36,10 @@
 
 	.my-bg-blue {
 		background-color: #29649c;
+	}
+
+	.my-text-white {
+		color: #f2f2f2;
 	}
 
 	.my-text-black {
