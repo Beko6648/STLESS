@@ -178,7 +178,11 @@ app.once('ready', () => {
             let camera_id = data[1];
 
             if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-                enter_or_leave === 'enter' && people_in_store_queue.length !== 0 ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+                if (enter_or_leave === 'enter') {
+                    camera_data[camera_id].enter_count++;
+                } else if (enter_or_leave === 'leave' && people_in_store_queue.length !== 0) {
+                    camera_data[camera_id].leave_count++;
+                }
                 people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
                 calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
                 regulatory_process(); // 規制判断を行う
@@ -244,7 +248,11 @@ app.once('ready', () => {
         let camera_id = data[1];
 
         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-            enter_or_leave === 'enter' && people_in_store_queue.length !== 0 ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+            if (enter_or_leave === 'enter') {
+                camera_data[camera_id].enter_count++;
+            } else if (enter_or_leave === 'leave' && people_in_store_queue.length !== 0) {
+                camera_data[camera_id].leave_count++;
+            }
             people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
             regulatory_process(); // 規制判断を行う
