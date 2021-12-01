@@ -21,6 +21,12 @@ app.commandLine.appendSwitch("disable-background-timer-throttling");
 // オプションとして変更できる変数の初期化
 let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
 let debug_mode = false // デバッグモード
+// システム設定の初期設定
+const initial_system_setting = {
+    max_people_in_store: 10,
+    system_start_time: '11:21',
+    system_end_time: '12:00',
+}
 
 // 変数の初期化
 let store_window = null;
@@ -32,7 +38,7 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 let is_allow_first_customer = false; // 先頭のお客様を許可するかどうか
 let max_people_in_store = null; // 店舗最大許容人数
 if (store.has('system_setting')) max_people_in_store = store.get('system_setting').max_people_in_store;
-let is_system_running = true; // システムの動作時間内かどうか
+let is_system_running = false; // システムの動作時間内かどうか
 let camera_data = [ // カメラデータ
     {
         camera_id: 0,
@@ -57,7 +63,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    // store.clear();
+    store.clear();
 
 
     // mysqlへの接続
@@ -106,6 +112,7 @@ app.once('ready', () => {
 
     // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
+        console.log('初期設定を行います');
         // 店舗IDの新規生成、DBに登録、自身の店舗IDを保存する
         const store_id = ULID.ulid();
 
@@ -131,23 +138,16 @@ app.once('ready', () => {
             }
         }
 
-        // システム設定の初期設定
-        const system_setting = {
-            max_people_in_store: 10,
-            system_start_time: '06:00',
-            system_end_time: '22:00'
-        }
-
         // ストアに初期値を保存
         store.set('store_id', store_id);
         store.set('display_setting', display_setting);
-        store.set('system_setting', system_setting);
+        store.set('system_setting', initial_system_setting);
 
         // 店舗IDをDBに登録
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
-            // console.log(results);
         });
+        console.log('初期設定完了');
     }
     // 規制情報表示画面を開く
     store_window.loadFile(path.join(__dirname, '../store_process/html/regulatory_info_view.html'));
@@ -176,9 +176,9 @@ app.once('ready', () => {
             // カメラデータを更新する
             let enter_or_leave = data[0];
             let camera_id = data[1];
-            enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
 
             if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+                enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
                 people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
                 calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
                 regulatory_process(); // 規制判断を行う
@@ -242,9 +242,9 @@ app.once('ready', () => {
         // カメラデータを更新する
         let enter_or_leave = data[0];
         let camera_id = data[1];
-        enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
 
         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+            enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
             people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
             regulatory_process(); // 規制判断を行う
@@ -264,18 +264,19 @@ app.once('ready', () => {
     // 客が出入りしたときに呼ばれ、客の買い物時間を計算する関数
     let people_in_store_queue_control = (enter_or_leave) => {
         // const arg_date = moment(time_data);
-        const arg_date = moment();
+        const arg_date = moment().format('YYYY-MM-DD HH:mm:ss');
 
         if (enter_or_leave === 'enter') { // 入店時ならキューに追加
-            people_in_store_queue.push(arg_date);
+            people_in_store_queue.push(moment(arg_date).format('YYYY-MM-DD HH:mm:ss'));
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
             const enter_time = people_in_store_queue.shift();
-            const leave_time = arg_date;
+            const leave_time = moment(arg_date).format('YYYY-MM-DD HH:mm:ss');
 
             shopping_time_queue.push({
                 enter_time: enter_time,
-                leave_time: leave_time
+                leave_time: leave_time,
+                people_in_store_count: people_in_store_queue.length,
             })
         } else {
             console.log('enterかleaveを入力してください');
@@ -342,17 +343,25 @@ app.once('ready', () => {
         console.log('shopping_time_queue', shopping_time_queue);
 
         shopping_time_queue.forEach(data => {
-            const enter_time = moment(data.enter_time, 'HH:mm');
-            const leave_time = moment(data.leave_time, 'HH:mm');
-            const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
+            // const enter_time = moment(data.enter_time, 'HH:mm');
+            // const leave_time = moment(data.leave_time, 'HH:mm');
+            // const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
 
-            const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
+            const enter_time = moment(data.enter_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+            const leave_time = moment(data.leave_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+            const diff_time = moment(moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes'), 'm').format('HH:mm:ss');
+            const people_in_store_count = data.people_in_store_count;
 
-            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time) VALUES ('${store_id}', '${now_date}', '${diff_time}')`, function (error, results, fields) {
+            console.log(enter_time, leave_time, diff_time, people_in_store_count);
+
+            // const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time, people_in_store_count) VALUES ('${store_id}', '${enter_time}', '${diff_time}', '${people_in_store_count}')`, function (error, results, fields) {
                 if (error) throw error;
                 console.log(results);
             });
         }).then = () => {
+            console.log('DBへの書き込みが完了しました');
             // １日分のデータを送信し終わったら、送信済みのデータを削除する
             shopping_time_queue = [];
 
@@ -361,10 +370,7 @@ app.once('ready', () => {
         }
     }
 
-    // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
-    cron.schedule('0 0 */1 * * *', () => {
-        // cron.schedule('0 */1 * * * *', () => {
-        console.log('1時間おきの実行');
+    const judge_is_system_running = () => {
         const old_is_system_running = is_system_running;
         const system_setting = store.get('system_setting');
 
@@ -376,14 +382,24 @@ app.once('ready', () => {
         is_system_running = is_between;
 
         if (old_is_system_running === true && is_system_running === false) {
-            console.log('システムが停止しました');
+            console.log('システムが停止しました。バッチ処理を行います。');
             // バッチ処理を行う
             batch_process();
         }
 
         console.log(is_between ? 'システムの動作時間内' : 'システムの動作時間外');
+    }
 
+    // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
+    // cron.schedule('0 0 */1 * * *', () => {
+    // デバッグ用の1分刻みチェック
+    // cron.schedule('0 */1 * * * *', () => {
+    cron.schedule('*/20 * * * * *', () => {
+        console.log('cron処理');
+        judge_is_system_running();
     });
+
+    judge_is_system_running();
 
 });
 

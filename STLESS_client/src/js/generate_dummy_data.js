@@ -83,6 +83,8 @@ const generate_dummy_data = () => {
         const diff_time = moment(moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes'), 'm').format('HH:mm:ss');
         const people_in_store_count = data.people_in_store_count;
 
+        console.log(enter_time, leave_time, diff_time, people_in_store_count);
+
         connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time, people_in_store_count) VALUES ('${store_id}', '${enter_time}', '${diff_time}', '${people_in_store_count}')`, function (error, results, fields) {
             if (error) throw error;
             // console.log(results);
