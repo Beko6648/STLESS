@@ -24,8 +24,8 @@ let debug_mode = false // デバッグモード
 // システム設定の初期設定
 const initial_system_setting = {
     max_people_in_store: 10,
-    system_start_time: '11:21',
-    system_end_time: '12:00',
+    system_start_time: '08:00',
+    system_end_time: '22:00',
 }
 
 // 変数の初期化
@@ -87,7 +87,7 @@ app.once('ready', () => {
 
 
     //-------------------------------------------------
-    // generate_graph_data();
+    generate_graph_data();
 
 
 
@@ -178,7 +178,7 @@ app.once('ready', () => {
             let camera_id = data[1];
 
             if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-                enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+                enter_or_leave === 'enter' && people_in_store_queue.length !== 0 ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
                 people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
                 calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
                 regulatory_process(); // 規制判断を行う
@@ -244,7 +244,7 @@ app.once('ready', () => {
         let camera_id = data[1];
 
         if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-            enter_or_leave === 'enter' ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
+            enter_or_leave === 'enter' && people_in_store_queue.length !== 0 ? camera_data[camera_id].enter_count++ : camera_data[camera_id].leave_count++;
             people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
             calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
             regulatory_process(); // 規制判断を行う
@@ -270,14 +270,18 @@ app.once('ready', () => {
             people_in_store_queue.push(moment(arg_date).format('YYYY-MM-DD HH:mm:ss'));
 
         } else if (enter_or_leave === 'leave') { // 退店時ならキューの先頭を取り出し、{入店時間,退店時間}というセットで買い物時間キューに格納
-            const enter_time = people_in_store_queue.shift();
-            const leave_time = moment(arg_date).format('YYYY-MM-DD HH:mm:ss');
+            if (people_in_store_queue.length !== 0) {
+                const enter_time = people_in_store_queue.shift();
+                const leave_time = moment(arg_date).format('YYYY-MM-DD HH:mm:ss');
 
-            shopping_time_queue.push({
-                enter_time: enter_time,
-                leave_time: leave_time,
-                people_in_store_count: people_in_store_queue.length,
-            })
+                shopping_time_queue.push({
+                    enter_time: enter_time,
+                    leave_time: leave_time,
+                    people_in_store_count: people_in_store_queue.length,
+                });
+            } else {
+                console.log('退店時に店内客数が0です');
+            }
         } else {
             console.log('enterかleaveを入力してください');
         }
