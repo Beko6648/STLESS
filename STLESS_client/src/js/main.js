@@ -19,26 +19,26 @@ app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 
 // オプションとして変更できる変数の初期化
-let regulation_nearing_ratio = 0.5; // 規制間近とする人数割合
+let regulation_nearing_ratio = 0.8; // 規制間近とする人数割合
 let debug_mode = false // デバッグモード
 // システム設定の初期設定
 const initial_system_setting = {
     max_people_in_store: 10,
     system_start_time: '08:00',
-    system_end_time: '22:00',
+    system_end_time: '10:00',
 }
 
 // 変数の初期化
 let store_window = null;
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
-let waiting_time_estimation_data = { hour: 0, minute: 0, second: 10 }; // 待ち時間推測用データ 形式{ hour, minute }
+let waiting_time_estimation_data = { hour: 0, minute: 10, second: 0 }; // 待ち時間推測用データ 形式{ hour, minute }
 let leave_time_array = []; // ３人分の予想退店時間が格納された配列
 let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに表示させるhtml
 let is_allow_first_customer = false; // 先頭のお客様を許可するかどうか
 let max_people_in_store = null; // 店舗最大許容人数
 if (store.has('system_setting')) max_people_in_store = store.get('system_setting').max_people_in_store;
-let is_system_running = false; // システムの動作時間内かどうか
+let is_system_running = true; // システムの動作時間内かどうか
 let camera_data = [ // カメラデータ
     {
         camera_id: 0,
@@ -80,7 +80,7 @@ app.once('ready', () => {
         connection.query(`SELECT WEEK(shopping_date) AS week, HOUR(shopping_date) AS hour, ROUND(AVG(people_in_store_count)) AS avg FROM shopping_time_data_table
                     WHERE store_id = '${store_id}' AND DATEDIFF(CURDATE(),shopping_date)/7 = 0 GROUP BY WEEK(shopping_date), HOUR(shopping_date);`, function (error, results, fields) {
             if (error) throw error;
-            console.log(results);
+            console.log('graph_data', results);
             store.set('graph_data', results);
         });
     }
@@ -354,32 +354,30 @@ app.once('ready', () => {
 
         console.log('shopping_time_queue', shopping_time_queue);
 
-        shopping_time_queue.forEach(data => {
-            // const enter_time = moment(data.enter_time, 'HH:mm');
-            // const leave_time = moment(data.leave_time, 'HH:mm');
-            // const diff_time = leave_time.diff(enter_time, 'minutes').format('HH:mm:ss');
 
-            const enter_time = moment(data.enter_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
-            const leave_time = moment(data.leave_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
-            const diff_time = moment(moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes'), 'm').format('HH:mm:ss');
-            const people_in_store_count = data.people_in_store_count;
+        (async () => {
+            await Promise.all(shopping_time_queue.map(async data => {
+                const enter_time = moment(data.enter_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                const leave_time = moment(data.leave_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                const diff_time = moment(moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes'), 'm').format('HH:mm:ss');
+                const people_in_store_count = data.people_in_store_count;
 
-            console.log(enter_time, leave_time, diff_time, people_in_store_count);
+                console.log(enter_time, leave_time, diff_time, people_in_store_count);
 
-            // const now_date = moment().format('YYYY-MM-DD HH:mm:ss');
+                await connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time, people_in_store_count) VALUES ('${store_id}', '${enter_time}', '${diff_time}', '${people_in_store_count}');`, function (error, results, fields) {
+                    if (error) throw error;
+                });
+            })).then(() => {
+                console.log('DBへの書き込みが完了しました');
+                // １日分のデータを送信し終わったら、送信済みのデータを削除する
+                console.log('shopping_time_queue', shopping_time_queue);
+                shopping_time_queue = [];
+                console.log('shopping_time_queue', shopping_time_queue);
 
-            connection.query(`INSERT INTO shopping_time_data_table (store_id, shopping_date, shopping_time, people_in_store_count) VALUES ('${store_id}', '${enter_time}', '${diff_time}', '${people_in_store_count}')`, function (error, results, fields) {
-                if (error) throw error;
-                console.log(results);
+                // グラフデータを生成し、アプリストレージに保存する
+                generate_graph_data();
             });
-        }).then = () => {
-            console.log('DBへの書き込みが完了しました');
-            // １日分のデータを送信し終わったら、送信済みのデータを削除する
-            shopping_time_queue = [];
-
-            // グラフデータを生成し、アプリストレージに保存する
-            generate_graph_data();
-        }
+        })();
     }
 
     const judge_is_system_running = () => {
@@ -411,7 +409,8 @@ app.once('ready', () => {
         judge_is_system_running();
     });
 
-    judge_is_system_running();
+    // アプリ起動時の動作期間確認
+    // judge_is_system_running();
 
 });
 

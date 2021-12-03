@@ -204,7 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 // 差分の分数を計算
                 // let waiting_time = Math.round(leave_date.diff(now_date, 'minutes')); 中間発表のため秒単位に変更
-                let waiting_time = Math.round(leave_date.diff(now_date, 'seconds')); // 秒単位に変更
+                let waiting_time = Math.round(leave_date.diff(now_date, 'minutes')); // 秒単位に変更
                 if (waiting_time <= 1) {
                     document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: <span class='soon'>まもなく入店いただけます。</span></div>`;
                     // document.querySelector('.waiting_time_display').innerHTML += `<div class='waiting_time'>${index + 1}組目: 約${waiting_time}分</div>`;
