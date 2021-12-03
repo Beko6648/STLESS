@@ -36,13 +36,13 @@ import pytz
 
 
 while True:
-    for i in range(5):
+    for i in range(10):
         random_num = random.randint(0,1)
         print(json.dumps(['enter', random_num]))
         time.sleep(1)
-    # time.sleep(5)
+    time.sleep(5)
 
-    for i in range(5):
+    for i in range(10):
         random_num = random.randint(0,1)
         print(json.dumps(['leave', random_num]))
         time.sleep(1)

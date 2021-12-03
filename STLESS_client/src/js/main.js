@@ -63,7 +63,7 @@ app.once('ready', () => {
     // 設定の保存場所を表示
     console.log('設定ファイルの保存場所', store.path);
     // テスト用：設定情報をクリアする
-    store.clear();
+    // store.clear();
 
 
     // mysqlへの接続
@@ -80,14 +80,27 @@ app.once('ready', () => {
         connection.query(`SELECT WEEK(shopping_date) AS week, HOUR(shopping_date) AS hour, ROUND(AVG(people_in_store_count)) AS avg FROM shopping_time_data_table
                     WHERE store_id = '${store_id}' AND DATEDIFF(CURDATE(),shopping_date)/7 = 0 GROUP BY WEEK(shopping_date), HOUR(shopping_date);`, function (error, results, fields) {
             if (error) throw error;
-            console.log('graph_data', results);
             store.set('graph_data', results);
+        });
+    }
+
+    const generate_wait_time_estimation_data = () => {
+        const store_id = store.get('store_id');
+        connection.query(`SELECT TRUNCATE(SEC_TO_TIME(AVG(TIME_TO_SEC(shopping_time))),0) AS shopping_time_avg FROM shopping_time_data_table WHERE store_id = '${store_id}'`, function (error, results, fields) {
+            if (error) throw error;
+            shopping_time_avg = results[0].shopping_time_avg;
+            waiting_time_estimation_data.hour = moment(shopping_time_avg, 'HH:mm:ss').hours();
+            waiting_time_estimation_data.minute = moment(shopping_time_avg, 'HH:mm:ss').minutes();
+            // 秒の部分は無視する
+            // waiting_time_estimation_data.second = moment(shopping_time_avg, 'HH:mm:ss').seconds();
+            console.log('推測用データ', waiting_time_estimation_data);
         });
     }
 
 
     //-------------------------------------------------
     generate_graph_data();
+    generate_wait_time_estimation_data();
 
 
 
@@ -369,13 +382,15 @@ app.once('ready', () => {
                 });
             })).then(() => {
                 console.log('DBへの書き込みが完了しました');
-                // １日分のデータを送信し終わったら、送信済みのデータを削除する
-                console.log('shopping_time_queue', shopping_time_queue);
+                // １日分のデータを送信し終わったら、送信済みのデータを
                 shopping_time_queue = [];
-                console.log('shopping_time_queue', shopping_time_queue);
 
                 // グラフデータを生成し、アプリストレージに保存する
                 generate_graph_data();
+                // 待ち時間推測用データを更新する
+                generate_wait_time_estimation_data();
+
+
             });
         })();
     }
