@@ -13,6 +13,10 @@ const options = { /* ... */ };
 const io = require("socket.io")(httpServer, options);
 const mysql = require('mysql');
 const cron = require('node-cron');
+// api利用のためのモジュール
+const axios = require('axios')
+const crypto = require('crypto')
+const fs = require('fs')
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -532,5 +536,6 @@ ipcMain.handle('update_setting', (event, message) => {
         max_people_in_store = store.get('system_setting').max_people_in_store;
     }
     judge_is_system_running();
+
     return true;
 })
