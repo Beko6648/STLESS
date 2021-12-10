@@ -13,6 +13,10 @@ const options = { /* ... */ };
 const io = require("socket.io")(httpServer, options);
 const mysql = require('mysql');
 const cron = require('node-cron');
+// api利用のためのモジュール
+const axios = require('axios')
+const crypto = require('crypto')
+const fs = require('fs')
 
 // Chromiumによるバックグラウンド処理の遅延対策
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -29,8 +33,8 @@ const initial_system_setting = {
 }
 
 // 変数の初期化
-let connection = null;
-let store_window = null;
+let connection = null; // mysqlを利用するための変数
+let store_window = null; // アプリウィンドウ
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
 let waiting_time_estimation_data = { hour: 0, minute: 10, second: 0 }; // 待ち時間推測用データ 形式{ hour, minute }
@@ -334,8 +338,21 @@ const batch_process = () => {
             });
         })).then(() => {
             console.log('DBへの書き込みが完了しました');
-            // １日分のデータを送信し終わったら、送信済みのデータを
+            // １日分のデータを送信し終わったら、保持中のデータをリセットする
             shopping_time_queue = [];
+            people_in_store_queue = [];
+            next_html = 'allow_entry.html';
+            camera_data[0].enter_count = 0;
+            camera_data[0].leave_count = 0;
+            camera_data[1].enter_count = 0;
+            camera_data[1].leave_count = 0;
+
+            // 店内客数の変化を規制情報確認画面用に通知する
+            store_window.webContents.send('update_regulation_info', {
+                number_of_people: people_in_store_queue.length,
+                regulatory_status: next_html,
+                camera_data: camera_data
+            });
 
             // グラフデータを生成し、アプリストレージに保存する
             generate_graph_data();
@@ -519,5 +536,6 @@ ipcMain.handle('update_setting', (event, message) => {
         max_people_in_store = store.get('system_setting').max_people_in_store;
     }
     judge_is_system_running();
+
     return true;
 })

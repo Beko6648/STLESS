@@ -1,4 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
+    const greeting = new Audio('../voices/greeting_1.wav');
+    greeting.play();
+
     const socket = io();
     socket.on('next_html', (next_html) => {
         console.log(next_html);

@@ -2,6 +2,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // スリープを実現するための関数
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+    const greeting = new Audio('../voices/greeting_2.wav');
+    greeting.play();
+
     const socket = io();
     socket.on('next_html', (next_html) => {
         console.log(next_html);
