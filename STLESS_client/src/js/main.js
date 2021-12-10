@@ -45,7 +45,7 @@ let camera_data = [ // カメラデータ
         camera_id: 0,
         enter_count: 0,
         leave_count: 0,
-        streaming_address: 'http://10.10.50.196:8000/',
+        streaming_address: 'http://192.168.2.121:8000/',
         is_open_window: false,
     },
     {
@@ -190,36 +190,36 @@ app.once('ready', () => {
 
 
     //PythonShellのインスタンスpyshellを作成する。jsから呼ぶ出すpythonファイル名は'sample.py'----------------------------------------------------------------
-    let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
+    // let pyshell = new PythonShell(path.join(__dirname, '../python/sample.py'), { mode: 'json', pythonOptions: ['-u'] })
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
-    pyshell.on('message', function (data) {
-        // console.log(data);
+    // pyshell.on('message', function (data) {
+    //     // console.log(data);
 
-        // カメラデータを更新する
-        let enter_or_leave = data[0];
-        let camera_id = data[1];
+    //     // カメラデータを更新する
+    //     let enter_or_leave = data[0];
+    //     let camera_id = data[1];
 
-        if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
-            if (enter_or_leave === 'enter') {
-                camera_data[camera_id].enter_count++;
-            } else if (enter_or_leave === 'leave' && people_in_store_queue.length !== 0) {
-                camera_data[camera_id].leave_count++;
-            }
-            people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
-            calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
-            regulatory_process(); // 規制判断を行う
+    //     if (is_system_running) { // システムが動作中ならば、queue_controlとregulatory_processを実行する
+    //         if (enter_or_leave === 'enter') {
+    //             camera_data[camera_id].enter_count++;
+    //         } else if (enter_or_leave === 'leave' && people_in_store_queue.length !== 0) {
+    //             camera_data[camera_id].leave_count++;
+    //         }
+    //         people_in_store_queue_control(enter_or_leave); // 店内客数を更新する
+    //         calculate_leave_time_array(); // 店内客数に応じて待ち時間を計算する
+    //         regulatory_process(); // 規制判断を行う
 
-            // 店内客数の変化を規制情報確認画面用に通知する
-            store_window.webContents.send('update_regulation_info', {
-                number_of_people: people_in_store_queue.length,
-                regulatory_status: next_html,
-                camera_data: camera_data
-            });
-        } else {
-            console.log('システム終了時刻を過ぎています');
-        }
-    });
+    //         // 店内客数の変化を規制情報確認画面用に通知する
+    //         store_window.webContents.send('update_regulation_info', {
+    //             number_of_people: people_in_store_queue.length,
+    //             regulatory_status: next_html,
+    //             camera_data: camera_data
+    //         });
+    //     } else {
+    //         console.log('システム終了時刻を過ぎています');
+    //     }
+    // });
 
 
     // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
