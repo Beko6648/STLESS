@@ -328,7 +328,11 @@ const batch_process = () => {
         await Promise.all(shopping_time_queue.map(async data => {
             const enter_time = moment(data.enter_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
             const leave_time = moment(data.leave_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
-            const diff_time = moment(moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes'), 'm').format('HH:mm:ss');
+            const diff_minutes = moment(leave_time, 'YYYY-MM-DD HH:mm:ss').diff(moment(enter_time, 'YYYY-MM-DD HH:mm:ss'), 'minutes');
+            const hh = Math.floor(diff_minutes / 60);
+            const mm = diff_minutes % 60;
+            const diff_time = moment(`${hh}:${mm}:00`, 'HH:mm:ss').format('HH:mm:ss');
+            
             const people_in_store_count = data.people_in_store_count;
 
             console.log(enter_time, leave_time, diff_time, people_in_store_count);
