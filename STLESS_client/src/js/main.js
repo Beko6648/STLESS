@@ -34,6 +34,7 @@ const initial_system_setting = {
 
 // 変数の初期化
 let connection = null; // mysqlを利用するための変数
+let pool = null;
 let store_window = null; // アプリウィンドウ
 let people_in_store_queue = []; // 店内の客を管理するキュー入店時間を値として持っている
 let shopping_time_queue = []; // 入退店データキュー入店時間,退店時間を値として持っている
@@ -79,7 +80,7 @@ app.once('ready', () => {
     //     database: 'stless_db'
     // });
 
-    connection = mysql.createPool({
+    pool = mysql.createPool({
         host: 'localhost',
         user: 'root',
         password: '',
@@ -234,10 +235,10 @@ app.once('ready', () => {
 
 
     // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
-    // cron.schedule('0 0 */1 * * *', () => {
-    // デバッグ用の1分刻みチェック
-    // cron.schedule('0 */1 * * * *', () => {
-    cron.schedule('*/20 * * * * *', () => {
+    cron.schedule('0 0 */1 * * *', () => {
+        // デバッグ用の1分刻みチェック
+        // cron.schedule('0 */1 * * * *', () => {
+        // cron.schedule('*/20 * * * * *', () => {
         console.log('cron処理');
         judge_is_system_running();
     });
@@ -331,7 +332,16 @@ const batch_process = () => {
     console.log('shopping_time_queue', shopping_time_queue);
 
 
+
     (async () => {
+        connection = await new Promise((resolve, reject) => {
+            pool.getConnection((error, connection) => {
+                if (error) reject(error)
+                resolve(connection)
+            })
+        })
+
+
         await Promise.all(shopping_time_queue.map(async data => {
             const enter_time = moment(data.enter_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
             const leave_time = moment(data.leave_time, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
@@ -349,6 +359,7 @@ const batch_process = () => {
             });
         })).then(() => {
             console.log('DBへの書き込みが完了しました');
+            connection.release();
             // １日分のデータを送信し終わったら、保持中のデータをリセットする
             shopping_time_queue = [];
             people_in_store_queue = [];
@@ -397,7 +408,7 @@ const judge_is_system_running = () => {
 }
 
 // 初回起動時なら初期設定を行う関数
-const initialize_setting = () => {
+const initialize_setting = async () => {
     // 店舗IDが保存されていなければ、初期設定を行う
     if (!store.has('store_id')) {
         console.log('初期設定を行います');
@@ -431,29 +442,56 @@ const initialize_setting = () => {
         store.set('display_setting', display_setting);
         store.set('system_setting', initial_system_setting);
 
+        connection = await new Promise((resolve, reject) => {
+            pool.getConnection((error, connection) => {
+                if (error) reject(error)
+                resolve(connection)
+            })
+        })
+
         // 店舗IDをDBに登録
         connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
             if (error) throw error;
+            connection.release();
         });
         console.log('初期設定完了');
     }
 }
 
 // グラフデータを生成し、アプリストレージに保存する関数
-const generate_graph_data = () => {
+const generate_graph_data = async () => {
     const store_id = store.get('store_id');
+
+    connection = await new Promise((resolve, reject) => {
+        pool.getConnection((error, connection) => {
+            if (error) reject(error)
+            resolve(connection)
+        })
+    })
+
     connection.query(`SELECT WEEK(shopping_date) AS week, HOUR(shopping_date) AS hour, ROUND(AVG(people_in_store_count)) AS avg FROM shopping_time_data_table
                     WHERE store_id = '${store_id}' AND DATEDIFF(CURDATE(),shopping_date)/7 = 0 GROUP BY WEEK(shopping_date), HOUR(shopping_date);`, function (error, results, fields) {
         if (error) throw error;
         store.set('graph_data', results);
+        console.log('graph_data', results);
+        connection.release();
     });
 }
 
 // 待ち時間推測用データを生成する関数
-const generate_wait_time_estimation_data = () => {
+const generate_wait_time_estimation_data = async () => {
     const store_id = store.get('store_id');
+
+    connection = await new Promise((resolve, reject) => {
+        pool.getConnection((error, connection) => {
+            if (error) reject(error)
+            resolve(connection)
+        })
+    })
+
     connection.query(`SELECT TRUNCATE(SEC_TO_TIME(AVG(TIME_TO_SEC(shopping_time))),0) AS shopping_time_avg FROM shopping_time_data_table WHERE store_id = '${store_id}'`, function (error, results, fields) {
         if (error) throw error;
+        connection.release();
         shopping_time_avg = results[0].shopping_time_avg;
         waiting_time_estimation_data.hour = moment(shopping_time_avg, 'HH:mm:ss').hours();
         waiting_time_estimation_data.minute = moment(shopping_time_avg, 'HH:mm:ss').minutes();
