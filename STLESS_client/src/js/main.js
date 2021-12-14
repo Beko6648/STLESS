@@ -11,7 +11,7 @@ const port = 3000;
 const httpServer = require("http").createServer(express_app);
 const options = { /* ... */ };
 const io = require("socket.io")(httpServer, options);
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cron = require('node-cron');
 // api利用のためのモジュール
 const axios = require('axios')
@@ -72,7 +72,14 @@ app.once('ready', () => {
 
 
     // mysqlへの接続
-    connection = mysql.createConnection({
+    // connection = mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     password: '',
+    //     database: 'stless_db'
+    // });
+
+    connection = mysql.createPool({
         host: 'localhost',
         user: 'root',
         password: '',
@@ -332,7 +339,7 @@ const batch_process = () => {
             const hh = Math.floor(diff_minutes / 60);
             const mm = diff_minutes % 60;
             const diff_time = moment(`${hh}:${mm}:00`, 'HH:mm:ss').format('HH:mm:ss');
-            
+
             const people_in_store_count = data.people_in_store_count;
 
             console.log(enter_time, leave_time, diff_time, people_in_store_count);

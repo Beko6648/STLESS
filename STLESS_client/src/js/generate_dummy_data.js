@@ -1,14 +1,22 @@
 const moment = require("moment");
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const { resolve } = require("path/posix");
 
 // mysqlへの接続
-let connection = mysql.createConnection({
+// let connection = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'root',
+//     password: '',
+//     database: 'stless_db'
+// });
+
+let connection = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'stless_db'
 });
+
 
 const get_random_int = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
