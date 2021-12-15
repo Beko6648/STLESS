@@ -33,7 +33,7 @@ const delete_shopping_time_data = async () => {
 
 
 const generate_dummy_data = () => {
-    const store_id = "01FPVKFTGBS7EFDW6ARRCG4TAF";
+    const store_id = "01FPXS88G3G1YNQSGN5VP9HG7G";
     const system_start_time = moment('06:00', 'HH:mm');
     const system_end_time = moment('22:00', 'HH:mm');
 
