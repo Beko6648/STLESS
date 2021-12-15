@@ -44,7 +44,7 @@ let next_html = 'allow_entry.html'; // 規制情報表示ディスプレイに�
 let is_allow_first_customer = false; // 先頭のお客様を許可するかどうか
 let max_people_in_store = null; // 店舗最大許容人数
 if (store.has('system_setting')) max_people_in_store = store.get('system_setting').max_people_in_store;
-let is_system_running = true; // システムの動作時間内かどうか
+let is_system_running = false; // システムの動作時間内かどうか
 let camera_data = [ // カメラデータ
     {
         camera_id: 0,
@@ -238,10 +238,10 @@ app.once('ready', () => {
 
 
     // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
-    // cron.schedule('0 0 */1 * * *', () => {
+    cron.schedule('0 0 */1 * * *', () => {
     // デバッグ用の1分刻みチェック
     // cron.schedule('0 */1 * * * *', () => {
-    cron.schedule('*/20 * * * * *', () => {
+    // cron.schedule('*/20 * * * * *', () => {
         console.log('cron処理');
         judge_is_system_running();
     });
