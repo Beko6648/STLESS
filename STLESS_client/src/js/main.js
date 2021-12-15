@@ -239,9 +239,9 @@ app.once('ready', () => {
 
     // 1時間おきにシステムの動作期間内かどうかを確認し、動作期間外になったらバッチ処理を行う
     cron.schedule('0 0 */1 * * *', () => {
-    // デバッグ用の1分刻みチェック
-    // cron.schedule('0 */1 * * * *', () => {
-    // cron.schedule('*/20 * * * * *', () => {
+        // デバッグ用の1分刻みチェック
+        // cron.schedule('0 */1 * * * *', () => {
+        // cron.schedule('*/20 * * * * *', () => {
         console.log('cron処理');
         judge_is_system_running();
     });
@@ -441,7 +441,7 @@ const initialize_setting = () => {
         let connection = mysql.createConnection(db_data);
 
         // 店舗IDをDBに登録
-        connection.query(`INSERT INTO store_table (id, data_transfer_flag) VALUES ('${store_id}', '0')`, function (error, results, fields) {
+        connection.query(`INSERT INTO store_table (id) VALUES ('${store_id}')`, function (error, results, fields) {
             if (error) throw error;
             connection.end();
             console.log('初期設定完了');
