@@ -23,26 +23,39 @@ import pytz
 #     return dict
 
 
-
-# while True:
-#     for i in range(10):
-#         print(json.dumps('enter'))
-#         time.sleep(1)
-#     time.sleep(5)
-
-#     for i in range(10):
-#         print(json.dump('leave'))
-#         time.sleep(1)
-
+people_in_store = 0
 
 while True:
-    for i in range(10):
-        random_num = random.randint(0,1)
-        print(json.dumps(['enter', random_num]))
-        time.sleep(1)
-    time.sleep(5)
+    random_num = random.randint(1,10)
+    if(people_in_store<10):
+        if(random_num<=7):
+            people_in_store+=1
+            print(json.dumps(['enter',0]))
+        else:
+            if(people_in_store!=0):
+                people_in_store-=1
+                print(json.dumps(['leave',0]))
+    else:
+        if(random_num>5):
+            people_in_store+=1
+            print(json.dumps(['enter',0]))
+        else:
+            if(people_in_store!=0):
+                people_in_store-=1 
+                print(json.dumps(['leave',0]))
 
-    for i in range(10):
-        random_num = random.randint(0,1)
-        print(json.dumps(['leave', random_num]))
-        time.sleep(1)
+    time.sleep(random.randint(60,180)) # 1分~10分
+    # time.sleep(1)
+
+
+
+    # for i in range(10):
+    #     random_num = random.randint(0,1)
+    #     print(json.dumps(['enter', random_num]))
+    #     time.sleep(1)
+    # time.sleep(5)
+
+    # for i in range(10):
+    #     random_num = random.randint(0,1)
+    #     print(json.dumps(['leave', random_num]))
+    #     time.sleep(1)

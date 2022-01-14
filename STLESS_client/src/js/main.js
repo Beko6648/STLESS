@@ -209,7 +209,7 @@ app.once('ready', () => {
 
     // pythonからのメッセージを受け取り、queue_controlとregulatory_processに引き渡す
     // pyshell.on('message', function (data) {
-    //     // console.log(data);
+    //     console.log(data);
 
     //     // カメラデータを更新する
     //     let enter_or_leave = data[0];
