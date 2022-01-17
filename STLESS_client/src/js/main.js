@@ -50,14 +50,14 @@ let camera_data = [ // カメラデータ
         camera_id: 0,
         enter_count: 0,
         leave_count: 0,
-        streaming_address: 'http://192.168.2.121:8000/',
+        streaming_address: 'http://10.10.51.31:8000/',
         is_open_window: false,
     },
     {
         camera_id: 1,
         enter_count: 0,
         leave_count: 0,
-        streaming_address: 'http://10.10.50.196:8000/',
+        streaming_address: 'http://10.10.51.132:8000/',
         is_open_window: false,
     }
 ];
@@ -529,7 +529,7 @@ ipcMain.handle('camera_streaming', (event, camera_id) => {
             show: true,
             title: 'CAMERA_STREAMING',
             backgroundColor: '#F8F9FA',
-            width: 800,
+            width: 330,
             height: 600,
             webPreferences: {
                 nodeIntegration: true,
