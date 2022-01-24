@@ -307,7 +307,7 @@ let regulatory_process = () => {
     } else if (max_people_in_store * regulation_nearing_ratio <= people_count) { // 規制間近
         if (next_html === 'regulation_and_time.html') {
             // 先頭のお客様・・・通知する
-            io.emit('allow_first_customer', true);
+            io.emit('allow_first_customer', 'regulation_nearing.html');
             allow_first_customer = true;
         }
         next_html = 'regulation_nearing.html';
@@ -315,7 +315,7 @@ let regulatory_process = () => {
     } else {
         if (next_html === 'regulation_and_time.html') {
             // 先頭のお客様・・・通知する
-            io.emit('allow_first_customer', true);
+            io.emit('allow_first_customer', 'allow_entry.html');
             allow_first_customer = true;
         }
         next_html = 'allow_entry.html';

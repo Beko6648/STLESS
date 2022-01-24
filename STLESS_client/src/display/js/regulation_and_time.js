@@ -8,45 +8,17 @@ window.addEventListener('DOMContentLoaded', () => {
     const socket = io();
     socket.on('next_html', (next_html) => {
         console.log(next_html);
-        if (displaying_URL != next_html) {
-            switch (next_html) {
-                case 'allow_entry.html':
-                    document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
-                    break;
-                case 'regulation_nearing.html':
-                    document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
-                    break;
-                case 'regulation_and_time.html':
-                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                    break;
-                case 'regulation_without_time.html':
-                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
-                    break;
-
-                default:
-                    break;
-            }
-            anim.setDirection(-1);
-            anim.play();
-            document.querySelector('.regulatory_info').classList.remove('open');
-            document.querySelector('.regulatory_info').classList.add('close');
-            document.querySelector('.graph_container').classList.remove('open');
-            document.querySelector('.graph_container').classList.add('close');
-            anim.onLoopComplete = (() => {
-                anim.stop();
-                window.location.assign(next_html);
-            })
-        }
+        screen_transition(next_html);
     });
 
     // 先頭の客を許可する
-    socket.on('allow_first_customer', () => {
+    socket.on('allow_first_customer', (next_html) => {
         const first_waiting_time = document.querySelector('.waiting_time:nth-child(2)');
         first_waiting_time.innerHTML = `1組目:どうぞご入店ください`;
         stop_timer();
         (async () => {
             await _sleep(5000);
-            start_timer();
+            screen_transition(next_html);
         })();
     })
 
@@ -188,6 +160,38 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     xhr.send();
 
+
+    const screen_transition = (next_html) => {
+        if (displaying_URL != next_html) {
+            switch (next_html) {
+                case 'allow_entry.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.allow_card.color_input}`;
+                    break;
+                case 'regulation_nearing.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.near_card.color_input}`;
+                    break;
+                case 'regulation_and_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+                case 'regulation_without_time.html':
+                    document.querySelector('html').style.backgroundColor = `${display_setting.regulation_card.color_input}`;
+                    break;
+
+                default:
+                    break;
+            }
+            anim.setDirection(-1);
+            anim.play();
+            document.querySelector('.regulatory_info').classList.remove('open');
+            document.querySelector('.regulatory_info').classList.add('close');
+            document.querySelector('.graph_container').classList.remove('open');
+            document.querySelector('.graph_container').classList.add('close');
+            anim.onLoopComplete = (() => {
+                anim.stop();
+                window.location.assign(next_html);
+            })
+        }
+    }
 
     const api_access = () => {
         let xhr = new XMLHttpRequest();
