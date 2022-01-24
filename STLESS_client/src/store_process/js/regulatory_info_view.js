@@ -25,6 +25,24 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     })
 
+    document.querySelectorAll('#regulatory_status_container').forEach((element, index) => {
+        element.addEventListener('click', () => {
+            (async () => {
+                const data = await ipcRenderer.invoke('plus_customer', index);
+                console.log('plus_customer', data);
+            })()
+        })
+    })
+
+    document.querySelectorAll('#number_of_people_container').forEach((element, index) => {
+        element.addEventListener('click', () => {
+            (async () => {
+                const data = await ipcRenderer.invoke('minus_customer', index);
+                console.log('minus_customer', data);
+            })()
+        })
+    })
+
     // 店内客数が変化したタイミングで送られてくる規制情報を元に表示を更新する
     ipcRenderer.on("update_regulation_info", (event, regulation_info_obj) => {
         update_regulation_info(regulation_info_obj);
